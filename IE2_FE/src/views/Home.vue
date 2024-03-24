@@ -44,15 +44,15 @@
             <i class="el-icon-location"></i>
             <span>我的空间</span>
           </template>
-          <el-menu-item index="/entity">
+          <el-menu-item index="/selfgraph">
             <i class="el-icon-share"></i>
             <span slot="title">自定义图谱</span>
           </el-menu-item>
-           <el-menu-item index="/type">
+           <el-menu-item index="/mycollect">
             <i class="el-icon-menu"></i>
             <span slot="title">节点收藏</span>
           </el-menu-item>
-          <el-menu-item index="/set">
+          <el-menu-item index="/setting">
             <i class="el-icon-menu"></i>
             <span slot="title">个人设置</span>
           </el-menu-item>
