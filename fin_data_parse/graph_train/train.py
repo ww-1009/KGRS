@@ -96,11 +96,11 @@ def load_model(model, path):
 def get_related_entities(model, entity_id):
     # 将实体id转换为张量
     node_pairs_tensor = torch.tensor([[entity_id, neighbor_id] for neighbor_id in range(len(entity_datas))], dtype=torch.long).to(device)
-    print("entity_id_tensor:", node_pairs_tensor.shape)
+    # print("entity_id_tensor:", node_pairs_tensor.shape)
 
     # 使用模型预测相关实体id
     prediction = model(data.x, data.edge_index, node_pairs_tensor)
-    print("prediction:",prediction.shape)
+    # print("prediction:",prediction.shape)
 
     # 使用循环找到张量中数值最大的5个元素及其值
     values = []
@@ -139,14 +139,14 @@ if __name__ == '__main__':
     optimizer = Adam(model.parameters(), lr=0.01)
     criterion = BCEWithLogitsLoss()
 
-    # 训练模型
-    for epoch in range(100):
-        loss = train(data, node_pairs_tensor, labels_tensor)
-        print(f'Epoch {epoch + 1}, Loss: {loss:.4f}')
-
-    # 保存模型
+    # # 训练模型
+    # for epoch in range(100):
+    #     loss = train(data, node_pairs_tensor, labels_tensor)
+    #     print(f'Epoch {epoch + 1}, Loss: {loss:.4f}')
+    #
+    # # 保存模型
     model_path = "model32.ckpt"
-    save_model(model, model_path)
+    # save_model(model, model_path)
 
     # 加载模型
     load_model(model, model_path)

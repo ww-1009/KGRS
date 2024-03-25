@@ -267,26 +267,26 @@ export default {
       console.log(item);
     },
     //实现信息模糊查询
-    queryindex() {
-      let that = this;
-      this.$http
-        .post("nasdaq/index/", {
-          inputstr: that.inputStr,
-        })
-        .then(function (res) {
-          if (res.data.code === 1) {
-            that.possible_out = res.data.data;
-            //提示：
-          } else {
-            //失败的提示！
-            that.$message.error(res.data.msg);
-          }
-        })
-        .catch(function (err) {
-          console.log(err);
-          that.$message.error("获取后端查询结果出现异常!");
-        });
-    },
+    // queryindex() {
+    //   let that = this;
+    //   this.$http
+    //     .post("nasdaq/index/", {
+    //       inputstr: that.inputStr,
+    //     })
+    //     .then(function (res) {
+    //       if (res.data.code === 1) {
+    //         that.possible_out = res.data.data;
+    //         //提示：
+    //       } else {
+    //         //失败的提示！
+    //         that.$message.error(res.data.msg);
+    //       }
+    //     })
+    //     .catch(function (err) {
+    //       console.log(err);
+    //       that.$message.error("获取后端查询结果出现异常!");
+    //     });
+    // },
     queryButten(){
       this.hasSearched=[];
       this.queryNasdaq();
@@ -305,18 +305,21 @@ export default {
           // explore: that.explore,
         })
         .then(function (res) {
-          if (res.data.code === 1) {
-            that.name = res.data.data[0];
-            that.img = res.data.data[1];
-            that.abstract = res.data.data[2];
-            that.entityNode = res.data.data[3];
-            that.entityLinks = res.data.data[4];
-            that.porpertyNode = res.data.data[5];
-            that.porpertyLinks = res.data.data[6];
-            that.typeNode = res.data.data[7];
-            that.typeLinks = res.data.data[8];
-            that.typeMap = res.data.data[9];
-            that.newstop= res.data.data[10]
+          if (res.data.code === 200) {
+            // that.name = res.data.data[0];
+            // that.img = res.data.data[1];
+            // that.abstract = res.data.data[2];
+            that.entityNode = res.data['entity_node'];
+            that.entityLinks = res.data['entity_relation'];
+            // that.porpertyNode = res.data.data[5];
+            // that.porpertyLinks = res.data.data[6];
+            // that.typeNode = res.data.data[7];
+            // that.typeLinks = res.data.data[8];
+            // that.typeMap = res.data.data[9];
+            // that.newstop= res.data.data[10]
+            console.log(that.entityNode)
+            console.log(that.entityLinks)
+
             // console.log(that.typeMap)
           } else {
             //失败的提示！

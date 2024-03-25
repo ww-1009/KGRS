@@ -231,7 +231,7 @@ export default {
     upDatecharts() {
       this.initechart();
       let that = this;
-      var data = this.entityNode;
+      var data = this.entityNode;     
       var links = this.entityLinks;
       var option = {
         // title: {
