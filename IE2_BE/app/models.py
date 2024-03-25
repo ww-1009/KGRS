@@ -49,13 +49,15 @@ class SelfEntity(models.Model):
     user_id = models.IntegerField()
     graph_id = models.IntegerField()
     entity_id = models.IntegerField()
+    deleted = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'self.entity'
+        db_table = 'self_entity'
 
 
 class SelfRelation(models.Model):
+    id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField()
     graph_id = models.IntegerField()
     id_s = models.IntegerField(db_column='id_S', blank=True, null=True)  # Field name made lowercase.
@@ -65,10 +67,11 @@ class SelfRelation(models.Model):
     id_o = models.IntegerField(db_column='id_O', blank=True, null=True)  # Field name made lowercase.
     update_time = models.DateTimeField(blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
+    deleted = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'self.relation'
+        db_table = 'self_relation'
 
 
 class SelfGraphInfo(models.Model):
@@ -78,6 +81,7 @@ class SelfGraphInfo(models.Model):
     deleted = models.IntegerField(blank=True, null=True)
     update_time = models.DateTimeField(blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False

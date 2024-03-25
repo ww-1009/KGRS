@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-table
-            :data="EntityInfoList.filter(data => !search || data.entity.toLowerCase().includes(search.toLowerCase()))"
+            :data="entityInfoList.filter(data => !search || data.entity.toLowerCase().includes(search.toLowerCase()))"
             style="width: 100%">
             <el-table-column label="id" prop="id" width="80">
             </el-table-column>
@@ -72,36 +72,21 @@
 <script>
 export default {
     name: "EntityTable",
+    props: {
+        activeGraphId: 0,
+    },
     data() {
         return {
             dialogVisible: false,
             dialog2Visible: false,
             addFlag: true,
             page: 1,
-            total: 3,
+            total: 0,
             size: 10,
 
             tarinputVisible: false,
             tarinputValue: '',
-            EntityInfoList: [{
-                id: 0,
-                entity: '贾宝玉',
-                type: ["人", "男人", "主角"],
-                description: '是一个帮助了解红楼梦中人物关系的图谱',
-                img: ""
-            }, {
-                id: 1,
-                entity: '林黛玉',
-                type: ["人", "女人", "主角"],
-                description: '是一个帮助了解红楼梦中人物关系的图谱',
-                img: ""
-            }, {
-                id: 2,
-                entity: '薛宝钗',
-                type: ["人", "女人", "主角"],
-                description: '是一个帮助了解红楼梦中人物关系的图谱',
-                img: ""
-            }],
+            entityInfoList: [],
             entityInfo: {},
             search: '',
             curId: ''
@@ -156,7 +141,7 @@ export default {
                 //     message: res.data.Msg,
                 //     type: "success"
                 // });
-                this.getGraphInfoList();
+                this.getEntityInfoList();
             } catch (e) {
                 console.log(e);
             }
@@ -182,22 +167,32 @@ export default {
             this.tarinputValue = '';
         },
 
-        async getEntityInfoList() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/list",
-                //     qs.stringify({
-                //         page: this.page,
-                //         size: this.size
-                //     })
-                // );
-                // this.total = res.data.Data.Total;
-                // this.GraphInfoList = res.data.Data.List;
-                console.log("getBookList");
-            } catch (e) {
-                console.log(e);
-            }
-        },
+    getEntityInfoList() {
+      let that = this;
+      console.log(that.activeGraphId)
+      this.$http
+        .post("nasdaq/selfentitylist/", {
+            graph_id: that.activeGraphId,
+        })
+        .then(function (res) {
+          if (res.data.code === 200) {
+            that.entityInfoList = res.data['entity_info_list']
+            that.total = res.data['total']
+            //         page: this.page,
+            //         size: this.size
+            
+          } else {
+            //失败的提示！
+            that.$message("暂无数据");
+          }
+        })
+        .catch(function (err) {
+          console.log(err);
+          that.$message.error("获取后端查询结果出现异常!");
+        });
+    },
+
+
         async saveEntity() {
             try {
                 // let res = await axios.post(

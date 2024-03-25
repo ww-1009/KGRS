@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-table
-            :data="RelationInfoList.filter(data => !search || data.s.toLowerCase().includes(search.toLowerCase()))"
+            :data="relationInfoList.filter(data => !search || data.s.toLowerCase().includes(search.toLowerCase()))"
             style="width: 100%">
             <el-table-column label="id" prop="id" width="80">
             </el-table-column>
@@ -66,6 +66,9 @@
 <script>
 export default {
     name: "RelationTable",
+    props: {
+        activeGraphId: 1,
+    },
     data() {
         return {
             dialogVisible: false,
@@ -75,7 +78,7 @@ export default {
             total: 3,
             size: 10,
 
-            RelationInfoList: [{
+            relationInfoList: [{
                 id: 0,
                 id_s: 0,
                 s: '贾宝玉',
@@ -163,6 +166,32 @@ export default {
                 console.log(e);
             }
         },
+
+        getRelationInfoList() {
+            let that = this;
+            console.log(that.activeGraphId)
+            this.$http
+                .post("nasdaq/selfrelationlist/", {
+                    graph_id: that.activeGraphId,
+                })
+                .then(function (res) {
+                if (res.data.code === 200) {
+                    that.relationInfoList = res.data['relation_info_list']
+                    that.total = res.data['total']
+                    //         page: this.page,
+                    //         size: this.size
+                    
+                } else {
+                    //失败的提示！
+                    that.$message("暂无数据");
+                }
+                })
+                .catch(function (err) {
+                console.log(err);
+                that.$message.error("获取后端查询结果出现异常!");
+                });
+        },
+
         async saveRelation() {
             try {
                 // let res = await axios.post(

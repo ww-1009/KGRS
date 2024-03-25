@@ -8,10 +8,10 @@
                             <InfoTable v-if="activeName == 'activeinfo'" ref="activeinfo" @enter-graph="enterGraph"></InfoTable>
                         </el-tab-pane>
                         <el-tab-pane label="实体信息" name="activeentiey" :disabled="isDisabled">
-                            <EntityTable v-if="activeName == 'activeentiey'" ref="activeentiey"></EntityTable>
+                            <EntityTable v-if="activeName == 'activeentiey'" ref="activeentiey" :activeGraphId="activeGraphId"></EntityTable>
                         </el-tab-pane>
                         <el-tab-pane label="实体关系" name="activerelation" :disabled="isDisabled">
-                            <RelationTable v-if="activeName == 'activerelation'" ref="activerelation"></RelationTable>
+                            <RelationTable v-if="activeName == 'activerelation'" ref="activerelation" :activeGraphId="activeGraphId"></RelationTable>
                         </el-tab-pane>
                         <el-tab-pane label="图谱展示" name="activeshow" :disabled="isDisabled">
                             <GraphShow v-if="activeName == 'activeshow'" ref="activeshow"></GraphShow>
@@ -46,7 +46,10 @@ export default {
       return {
         activeName: 'activeinfo',
         isDisabled: true,
-        activeGraphId:0
+        activeGraphId:1,
+        entityTableData:{},
+        relationTableData:{},
+        entityNode:[],
       };
     },
     mounted(){
@@ -65,10 +68,37 @@ export default {
         this.$refs[this.activeName].getList();
       },
 
+    // getSelfGraph() {
+    //     let that = this;
+    //     this.$http
+    //     .post("nasdaq/selfgraph/", {
+    //         graph_id: that.activeGraphId,
+    //     })
+    //     .then(function (res) {
+    //         if (res.data.code === 200) {
+    //         that.entityTableData = {"entityInfoList": res.data['entity_info_list'],
+    //                                 "total": res.data['entity_info_list'].length};
+    //         // that.entityInfoList = res.data['entity_info_list'];
+    //         that.relationTableData = {"relationInfoList": res.data['relation_info_list'],
+    //                                   "total": res.data['relation_info_list'].length};
+    //         that.entityNode = res.data['entity_node'];
+    //         that.entityLinks = res.data['entity_relation'];
+    //         } else {
+    //         //失败的提示！
+    //         that.$message("暂无数据");
+    //         }
+    //     })
+    //     .catch(function (err) {
+    //         console.log(err);
+    //         that.$message.error("获取后端查询结果出现异常!");
+    //     });
+    // },
+
       enterGraph(data) {
         this.isDisabled = false;
         this.activeName = data.activeName;
         this.activeGraphId = data.graph_id;
+        // this.getSelfGraph();
       }
  
     }
@@ -80,7 +110,7 @@ export default {
 .el-row {
     margin-bottom: 40px;
 
-    &:last-child {
+    :last-child {
         margin-bottom: 0;
     }
 }

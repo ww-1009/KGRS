@@ -3,7 +3,7 @@
         <el-table
             :data="GraphInfoList.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
             style="width: 100%">
-            <el-table-column label="UpDate" prop="date" width="120">
+            <el-table-column label="UpDate" prop="update" width="120">
             </el-table-column>
             <el-table-column label="Name" prop="name" width="180">
             </el-table-column>
@@ -68,24 +68,9 @@ export default {
             dialog2Visible: false,
             addFlag: true,
             page: 1,
-            total: 3,
+            total: 0,
             size: 10,
-            GraphInfoList: [{
-                id: 0,
-                date: '2024-03-22',
-                name: '红楼梦人物知识图谱',
-                description: '是一个帮助了解红楼梦中人物关系的图谱'
-            }, {
-                id: 1,
-                date: '2024-03-22',
-                name: '计算机网络知识图谱',
-                description: '关于计算机网络的知识图谱'
-            }, {
-                id: 2,
-                date: '2024-03-22',
-                name: '医疗知识图谱',
-                description: '关于医疗的知识图谱'
-            }],
+            GraphInfoList: [],
             graphInfo: {},
             search: '',
             curId: ""
@@ -146,22 +131,6 @@ export default {
             }
         },
 
-        async getGraphInfoList() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/list",
-                //     qs.stringify({
-                //         page: this.page,
-                //         size: this.size
-                //     })
-                // );
-                // this.total = res.data.Data.Total;
-                // this.GraphInfoList = res.data.Data.List;
-                console.log("getGraphInfoList");
-            } catch (e) {
-                console.log(e);
-            }
-        },
         async saveGraph() {
             try {
                 // let res = await axios.post(
@@ -183,10 +152,36 @@ export default {
                 console.log(e);
             }
         },
-        enterGraph(index, row) {
-            console.log(row.id)
-            this.$emit('enter-graph', { activeName: "activeentiey", graph_id: row.id });
-        },
+
+    getGraphInfoList() {
+      let that = this;
+      this.$http
+        .post("nasdaq/graphinfolist/", {
+          user_id: 1,
+        })
+        .then(function (res) {
+          if (res.data.code === 200) {
+            that.GraphInfoList = res.data['graph_info_list']
+            that.total = res.data['total']
+            //         page: this.page,
+            //         size: this.size
+            that.dialogVisible = false;
+            
+          } else {
+            //失败的提示！
+            that.$message("暂无数据");
+          }
+        })
+        .catch(function (err) {
+          console.log(err);
+          that.$message.error("获取后端查询结果出现异常!");
+        });
+    },
+
+    enterGraph(index, row) {
+        console.log(row.id)
+        this.$emit('enter-graph', { activeName: "activeentiey", graph_id: row.id });
+    },
 
         // handleDelete(index, row) {
         //     console.log(index, row);
