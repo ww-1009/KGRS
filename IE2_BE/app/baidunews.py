@@ -23,7 +23,6 @@ driver.get(baseURL)
 html = driver.page_source
 tree = etree.HTML(html)
 try:
-
     lis=tree.xpath('//div[@class="content_1YWBm"]/a')
     links = tree.xpath('//div[@class="content_1YWBm"]/a/@href')
     title = tree.xpath('//div[@class="content_1YWBm"]/a/div[@class="c-single-text-ellipsis"]/text()')
@@ -31,7 +30,6 @@ try:
     with open(file_name, 'w',encoding='utf-8') as file_obj:
         for i in range(12):
             file_obj.write(title[i]+';'+links[i]+'\n')
-            # print(title[i], links[i])
         for i in range(3):
             file_obj.write(img[i] + '\n')
     file_obj.close()

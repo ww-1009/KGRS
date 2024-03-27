@@ -10,9 +10,8 @@ print(len(class_tree))
 # 使用DiGraph创建有向图
 G = nx.DiGraph()
 G.add_edges_from(class_tree)
-
 # 使用Node2Vec训练模型
-node2vec = Node2Vec(G, dimensions=16, walk_length=8, num_walks=100, workers=6)
+node2vec = Node2Vec(G, dimensions=32, walk_length=8, num_walks=100, workers=6)
 model = node2vec.fit(window=8, min_count=1, batch_words=4)
 print("训练完成")
 

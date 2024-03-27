@@ -7,7 +7,7 @@
             </el-table-column>
             <el-table-column label="entity" prop="entity" width="100">
             </el-table-column>
-            <el-table-column label="Description" prop="description" width="500">
+            <el-table-column label="abstract" prop="abstract" width="500">
             </el-table-column>
             <el-table-column align="right">
                 <template slot="header" slot-scope="scope">
@@ -39,7 +39,7 @@
                     <el-input v-model="entityInfo.entity" placeholder="请输入实体名称"></el-input>
                 </el-form-item>
                 <el-form-item label="实体类型" style="width:500px">
-                    <el-tag :key="tag" v-for="tag in entityInfo.type" closable :disable-transitions="false"
+                    <el-tag :key="tag" v-for="tag in entityInfo.relatedType" closable :disable-transitions="false"
                         @close="tarClose(tag)">
                         {{ tag }}
                     </el-tag>
@@ -49,7 +49,7 @@
                     <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
                 </el-form-item>
                 <el-form-item label="实体描述" style="width:500px">
-                    <el-input v-model="entityInfo.description" type="textarea" :rows="3"
+                    <el-input v-model="entityInfo.abstract" type="textarea" :rows="3"
                         placeholder="请输入实体描述"></el-input>
                 </el-form-item>
             </el-form>

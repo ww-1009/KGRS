@@ -21,12 +21,13 @@ def get_fd_group(request):
 	data = json.loads(request.body.decode('utf-8'))
 	print(data['inputstr'])
 	try:
-		entity_node, entity_relation = get_fd_graph(data)
+		entity_node, entity_relation, entity_info_all, entity_top = get_fd_graph(data)
 	except Exception as e:
 		print(f'出错了{e}')
 		return JsonResponse({'code': 0, 'msg': "查询inputstr出现异常，具体错误：" + str(e)})
 
-	return JsonResponse({'code': 200, 'entity_node': entity_node, 'entity_relation': entity_relation})
+	return JsonResponse({'code': 200, 'entity_node': entity_node, 'entity_relation': entity_relation,
+						 'entity_info_all': entity_info_all, 'entity_top': entity_top})
 
 
 def new_self_graph(request):
@@ -88,16 +89,14 @@ def get_self_group(request):
 	data = json.loads(request.body.decode('utf-8'))
 	graph_id = data["graph_id"]
 	print(graph_id)
-	# try:
-	entity_info_list, entity_id_map = get_self_entity(graph_id)
-	relation_info_list = get_self_relation(graph_id, entity_id_map)
-	entity_node, entity_relation = get_self_graph(entity_info_list, relation_info_list, entity_id_map)
-	print(entity_info_list, relation_info_list)
-	# except Exception as e:
-	# 	print(f"出错了{e}")
-	# 	return JsonResponse({'code': 0, 'msg': "获取自有图谱出现异常，具体错误：" + str(e)})
-	return JsonResponse({'code': 200, 'entity_info_list': entity_info_list, 'relation_info_list': relation_info_list,
-						 'entity_node': entity_node, 'entity_relation': entity_relation})
+	try:
+		entity_info_list, entity_id_map = get_self_entity(graph_id)
+		relation_info_list = get_self_relation(graph_id)
+		entity_node, entity_relation, entity_info_all = get_self_graph(entity_info_list, relation_info_list, entity_id_map)
+	except Exception as e:
+		print(f"出错了{e}")
+		return JsonResponse({'code': 0, 'msg': "获取自有图谱出现异常，具体错误：" + str(e)})
+	return JsonResponse({'code': 200, 'entity_node': entity_node, 'entity_relation': entity_relation, 'entity_info_all': entity_info_all})
 
 
 def getnewstop(request):

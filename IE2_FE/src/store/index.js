@@ -13,6 +13,7 @@ export default new Vuex.Store({
     entityLinks: [],
     porpertyNode:[],
     porpertyLinks:[],
+    entityInfoAll: {},
     typeNode:[],
     typeLinks:[],
     typeMap:{},
@@ -44,6 +45,9 @@ export default new Vuex.Store({
     },
     changeEntityLinks(state,item){
       state.entityLinks=item
+    },
+    changeEntityInfoAll(state,item){
+      state.entityInfoAll=item
     },
     changeTypeLinks(state,item){
       state.typeLinks=item

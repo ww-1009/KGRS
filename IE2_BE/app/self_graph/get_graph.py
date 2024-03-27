@@ -22,10 +22,10 @@ def get_self_entity(graph_id):
 	self_entity_info = SelfEntity.objects.filter(graph_id=graph_id, deleted=0)
 	self_entity_info_datas = self_entity_info.values("entity_id", "entity", "imgurl", "relatedtype", "abstract")
 	for entity_info in self_entity_info_datas:
-		entity_id_map[entity_info["entity_id"]] = len(entity_id_map) + 1
+		entity_id_map[entity_info["entity_id"]] = len(entity_id_map)
 		relatedtype_list = entity_info['relatedtype'].split(";")
-		temp_dic = {"id": len(entity_id_map), "entity": entity_info["entity"], "img": entity_info["imgurl"],
-					'type': relatedtype_list, 'description': entity_info["abstract"]}
+		temp_dic = {"id": len(entity_id_map), "entity": entity_info["entity"], "img_url": entity_info["imgurl"],
+					'relatedType': relatedtype_list, 'abstract': entity_info["abstract"]}
 		entity_info_list.append(temp_dic)
 	return entity_info_list, entity_id_map
 
@@ -43,14 +43,17 @@ def get_self_relation(graph_id):
 
 
 def get_self_graph(entity_info_list, relation_info_list, entity_id_map):
+	print(entity_info_list)
 	entity_node = []
 	entity_relation = []
-	print(entity_id_map)
+	entity_info_all = {}
 	for entity_info in entity_info_list:
+		entity_info_all[entity_info["id"]] = entity_info
 		entity_node.append({"name": entity_info["entity"], "category": 1, "id": entity_info["id"]})
+
 	for relation_info in relation_info_list:
 		entity_relation.append({"source": entity_id_map[relation_info["id_s"]],
 								"target": entity_id_map[relation_info["id_o"]],
-								"category": 0, "value": relation_info['o'],
+								"category": 0, "value": relation_info['p'],
 								"symbolSize": 10})
-	return entity_node, entity_relation
+	return entity_node, entity_relation, entity_info_all

@@ -37,6 +37,22 @@ class FdRelation(models.Model):
         db_table = 'fd_relation'
         unique_together = (('id_s', 'id_o'),)
 
+class FdTop5(models.Model):
+    id = models.IntegerField(primary_key=True)
+    top1_id = models.IntegerField(blank=True, null=True)
+    value1 = models.FloatField(blank=True, null=True)
+    top2_id = models.IntegerField(blank=True, null=True)
+    value2 = models.FloatField(blank=True, null=True)
+    top3_id = models.IntegerField(blank=True, null=True)
+    value3 = models.FloatField(blank=True, null=True)
+    top4_id = models.IntegerField(blank=True, null=True)
+    value4 = models.FloatField(blank=True, null=True)
+    top5_id = models.IntegerField(blank=True, null=True)
+    value5 = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'fd_top5'
 
 class SelfEntity(models.Model):
     entity = models.CharField(max_length=255, blank=True, null=True)

@@ -21,7 +21,7 @@
           <Mysearch></Mysearch>
          
           <div
-            style="width: 100%; height: 640px; float: left"
+            style="width: 100%; height: 600px; float: left"
             ref="graph"
             v-loading="loading"
             element-loading-text="拼命加载中"
@@ -30,42 +30,12 @@
           >
             <el-empty description="暂无图谱" :image-size="200" style="margin-top:70px"></el-empty>
           </div>
-          <el-dialog
-            :title="this.inputStr"
-            :visible.sync="dialogVisible"
-            width="35%"
-            :before-close="handleClose"
-          >
-          <el-card :body-style="{ padding: '0px' }">
-          <el-row :gutter="20">
-            <el-col :span="9">
-              <div class="grid-content bg-purple">
-                <el-image :src="img">
-                  <div slot="placeholder" class="image-slot">
-                    <i class="el-icon-picture-outline"></i>
-                  </div>
-                </el-image>
-              </div>
-            </el-col>
-            <el-col :span="15">
-              <div class="grid-content bg-purple">
-                {{this.abstract}}
-              </div>
-            </el-col>
-          </el-row>
-          </el-card>
-            <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="dialogVisible = false"
-                >确 定</el-button
-              >
-            </span>
-          
-          </el-dialog>
         </el-card>
       </el-col>
       <el-col :span="7">
-        <el-card style="height: 800px">
-          <Myimage></Myimage>
+        <el-card style="height: 850px"> 
+          <Myimage v-if="!entitydetail"></Myimage>
+          <Entitydetail v-if="entitydetail" :entityInfo="entityInfo"></Entitydetail>
         </el-card>
       </el-col>
     </el-row>
@@ -76,11 +46,12 @@
 import { createNamespacedHelpers } from "vuex";
 import Myimage from "@/components/Image";
 import Mysearch from "@/components/Search";
+import Entitydetail from "@/components/EntityDetail"
 const { mapMutations, mapState, mapGetters, mapActions } =
   createNamespacedHelpers("mystrategy");
 
 export default {
-  components: { Myimage, Mysearch },
+  components: { Myimage, Mysearch, Entitydetail},
   data() {
     return {
       Mychart: null,
@@ -101,6 +72,8 @@ export default {
       ],
       loading: false,
       dialogVisible: false,
+      entitydetail : false,
+      entityInfo: {}
     };
   },
   created() {},
@@ -159,6 +132,14 @@ export default {
       },
       set(val) {
         this.$store.commit("changeEntityLinks", val);
+      },
+    },
+    entityInfoAll: {
+      get() {
+        return this.$store.state.entityInfoAll;
+      },
+      set(val) {
+        this.$store.commit("changeEntityInfoAll", val);
       },
     },
     img: {
@@ -229,6 +210,7 @@ export default {
     },
     //更新图谱
     upDatecharts() {
+      this.entitydetail = true;
       this.initechart();
       let that = this;
       var data = this.entityNode;     
@@ -349,6 +331,12 @@ export default {
             that.statu=!that.statu;
             // console.log(that.statu)
           } 
+        }
+      });
+      this.Mychart.on('mouseover', function (params) {
+        if (params.dataType == "node") {
+            that.entityInfo = that.entityInfoAll[params.data["id"]];
+            console.log(that.entityInfo)
         }
       });
 

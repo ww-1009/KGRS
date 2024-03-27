@@ -7,6 +7,8 @@ from torch.optim import Adam
 from gensim.models import KeyedVectors
 import numpy as np
 import random
+
+from lib.Db_sql import Db
 from lib.GetTrainDate import get_train_data
 
 # 检查CUDA是否可用
@@ -93,7 +95,47 @@ def load_model(model, path):
     model.load_state_dict(torch.load(path))
 
 
-def get_related_entities(model, entity_id):
+# def get_related_entities(model, entity_id):
+#     # 将实体id转换为张量
+#     node_pairs_tensor = torch.tensor([[entity_id, neighbor_id] for neighbor_id in range(len(entity_datas))], dtype=torch.long).to(device)
+#     # print("entity_id_tensor:", node_pairs_tensor.shape)
+#
+#     # 使用模型预测相关实体id
+#     prediction = model(data.x, data.edge_index, node_pairs_tensor)
+#     # print("prediction:",prediction.shape)
+#
+#     # 使用循环找到张量中数值最大的5个元素及其值
+#     values = []
+#     indices = []
+#     for i in range(len(prediction)):
+#         if len(values) < 5:
+#             values.append(prediction[i])
+#             indices.append(i)
+#         else:
+#             min_value = min(values)
+#             min_index = values.index(min_value)
+#             if prediction[i] > min_value:
+#                 values[min_index] = prediction[i]
+#                 indices[min_index] = i
+#
+#     top_dic = {}
+#     # 打印值和索引
+#     for value, index in zip(values, indices):
+#         top_dic[index] = value.item()
+#     # 将字典转换为列表
+#     top_list = list(top_dic.items())
+#     # 根据字典的值进行降序排序
+#     sorted_list = sorted(top_list, key=lambda x: x[1], reverse=True)
+#     # 将排序后的列表转换为字典
+#     sorted_dict = dict(sorted_list)
+#     print(sorted_dict)
+#     prediction_list = [entity_id]
+#     for key, value in sorted_dict.items():
+#         prediction_list.append(key)
+#         prediction_list.append(value)
+#     # 返回预测结果
+#     return tuple(prediction_list)
+def get_related_entities(model, entity_id, related_id_list):
     # 将实体id转换为张量
     node_pairs_tensor = torch.tensor([[entity_id, neighbor_id] for neighbor_id in range(len(entity_datas))], dtype=torch.long).to(device)
     # print("entity_id_tensor:", node_pairs_tensor.shape)
@@ -101,28 +143,12 @@ def get_related_entities(model, entity_id):
     # 使用模型预测相关实体id
     prediction = model(data.x, data.edge_index, node_pairs_tensor)
     # print("prediction:",prediction.shape)
-
-    # 使用循环找到张量中数值最大的5个元素及其值
-    values = []
-    indices = []
-    for i in range(len(prediction)):
-        if len(values) < 5:
-            values.append(prediction[i])
-            indices.append(i)
-        else:
-            min_value = min(values)
-            min_index = values.index(min_value)
-            if prediction[i] > min_value:
-                values[min_index] = prediction[i]
-                indices[min_index] = i
-
-    # 打印值和索引
-    for value, index in zip(values, indices):
-        print(f"Value: {value}, Index: {index}")
-
+    related_prediction_dic = {}
+    for related_id in related_id_list:
+        # 找到与指定实体ID相关的预测值
+        related_prediction_dic[related_id] = prediction[related_id].item()
     # 返回预测结果
-    return prediction
-
+    return related_prediction_dic
 
 if __name__ == '__main__':
     entity_datas, relation_datas = get_train_data()
@@ -139,10 +165,10 @@ if __name__ == '__main__':
     optimizer = Adam(model.parameters(), lr=0.01)
     criterion = BCEWithLogitsLoss()
 
-    # # 训练模型
-    # for epoch in range(100):
-    #     loss = train(data, node_pairs_tensor, labels_tensor)
-    #     print(f'Epoch {epoch + 1}, Loss: {loss:.4f}')
+    # 训练模型
+    for epoch in range(100):
+        loss = train(data, node_pairs_tensor, labels_tensor)
+        print(f'Epoch {epoch + 1}, Loss: {loss:.4f}')
     #
     # # 保存模型
     model_path = "model32.ckpt"
@@ -151,11 +177,31 @@ if __name__ == '__main__':
     # 加载模型
     load_model(model, model_path)
 
-    # 输入实体id
-    entity_id = 12578
-    # 获取相关实体id
-    related_entities = get_related_entities(model, entity_id)
+    sql_datas = []
+    db = Db('FD_dg')
+    for entity_id in range(47065):
+        relation_id_list = []
+        results = db.select("select id_S, id_O from fd_relation where id_S = '%s' or id_O = '%s'", entity_id, entity_id)
+        sql_data = [entity_id]
+        for item in results:
+            relation_id_list.append(item[0])
+            relation_id_list.append(item[1])
+        relation_id_list = list(set(relation_id_list))
+        relation_id_list.remove(entity_id)
+        # 获取相关实体id
+        related_prediction_dic = get_related_entities(model, entity_id, relation_id_list)
+        # 获取前五大
+        sorted_items = sorted(related_prediction_dic.items(), key=lambda x: x[1], reverse=True)[:5]
+        for key, value in sorted_items:
+            sql_data.append(key)
+            sql_data.append(value)
+        while len(sql_data) < 11:
+            sql_data.extend([-1])
+        print(sql_data)
+        sql_datas.append(tuple(sql_data))
 
-    # # 打印相关实体id
-    # print(related_entities)
+    sql_string = 'insert into fd_top5 (id, top1_id, value1, top2_id, value2,top3_id, value3,top4_id, value4,top5_id, value5) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
+    db.insert_ignore(sql_string, sql_datas)
+
+
 

@@ -33,10 +33,8 @@ class ModifiedGCN(torch.nn.Module):
         x = F.relu(self.conv1(x, edge_index))
         x = F.dropout(x, training=self.training)
         x = F.relu(self.conv2(x, edge_index))
-
         # 提取节点对的特征
         node_pairs_features = torch.cat([x[node_pairs[:, 0]], x[node_pairs[:, 1]]], dim=-1)
-
         # 使用全连接层预测节点对之间的链接概率
         out = self.fc(node_pairs_features)
         return out
