@@ -49,12 +49,11 @@
                     <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
                 </el-form-item>
                 <el-form-item label="实体描述" style="width:500px">
-                    <el-input v-model="entityInfo.abstract" type="textarea" :rows="3"
-                        placeholder="请输入实体描述"></el-input>
+                    <el-input v-model="entityInfo.abstract" type="textarea" :rows="3" placeholder="请输入实体描述"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="success" @click="saveEntity()">提交</el-button>
+                <el-button type="success" @click="saveEntityInfo()">提交</el-button>
                 <el-button type="primary" @click="dialogVisible = false">取消</el-button>
             </span>
         </el-dialog>
@@ -87,10 +86,20 @@ export default {
             tarinputVisible: false,
             tarinputValue: '',
             entityInfoList: [],
-            entityInfo: {},
+            entityInfo: { entity_id: -1, id: -1, entity: '', img_url: '', relatedType: [], abstract: '' },
             search: '',
             curId: ''
         }
+    },
+    computed: {
+        userId: {
+            get() {
+                return this.$store.state.userId;
+            },
+            set(val) {
+                this.$store.commit("changeUserId", val);
+            },
+        },
     },
     watch: {
         //假如现在是第三页，只有一条数据了。将其删除，就没有第三页了。应该跳到第二页展示出5条数据。
@@ -167,52 +176,61 @@ export default {
             this.tarinputValue = '';
         },
 
-    getEntityInfoList() {
-      let that = this;
-      console.log(that.activeGraphId)
-      this.$http
-        .post("nasdaq/selfentitylist/", {
-            graph_id: that.activeGraphId,
-        })
-        .then(function (res) {
-          if (res.data.code === 200) {
-            that.entityInfoList = res.data['entity_info_list']
-            that.total = res.data['total']
-            //         page: this.page,
-            //         size: this.size
-            
-          } else {
-            //失败的提示！
-            that.$message("暂无数据");
-          }
-        })
-        .catch(function (err) {
-          console.log(err);
-          that.$message.error("获取后端查询结果出现异常!");
-        });
-    },
+        getEntityInfoList() {
+            let that = this;
+            console.log(that.activeGraphId)
+            this.$http
+                .post("nasdaq/selfentitylist/", {
+                    graph_id: that.activeGraphId,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.entityInfoList = res.data['entity_info_list']
+                        that.total = res.data['total']
+                        //         page: this.page,
+                        //         size: this.size
 
+                    } else {
+                        //失败的提示！
+                        that.$message("暂无数据");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("获取后端查询结果出现异常!");
+                });
+        },
 
-        async saveEntity() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/save",
-                //     qs.stringify({
-                //         id: this.graphInfo.id,
-                //         name: this.graphInfo.name,
-                //         type: this.graphInfo.description
-                //     })
-                // );
-                this.dialogVisible = false;
-                this.entityInfo = {};
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getEntityInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+        saveEntityInfo() {
+            let that = this;
+            this.$http
+                .post("nasdaq/saveentityinfo/", {
+                    user_id: that.userId,
+                    graph_id: that.activeGraphId,
+                    entity_id: that.entityInfo.entity_id,
+                    entity: that.entityInfo.entity,
+                    imgurl: that.entityInfo.img_url,
+                    abstract: that.entityInfo.abstract,
+                    relatedtype: that.entityInfo.relatedType,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.dialogVisible = false;
+                        that.graphInfo = { entity_id: -1, id: -1, entity: '', img_url: '', relatedType: [], abstract: '' };
+                        that.getEntityInfoList();
+                        that.$message({
+                            message: "数据更新成功!",
+                            type: 'success'
+                        });
+                    } else {
+                        //失败的提示！
+                        that.$message("数据更新失败");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("后端更新数据出现异常!");
+                });
         },
 
         handleDelete(index, row) {

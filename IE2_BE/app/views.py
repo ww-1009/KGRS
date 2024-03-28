@@ -9,7 +9,8 @@ from django.shortcuts import render
 
 from app.models import SelfGraphInfo, SelfRelation, SelfEntity
 from .fd_graph.get_graph import get_fd_graph
-from .self_graph.get_graph import get_group_info, get_self_entity, get_self_relation, get_self_graph
+from .self_graph.get_graph import get_graph_info, get_self_entity, get_self_relation, get_self_graph
+from .self_graph.save_graph import save_group_info, save_self_entity
 
 CURRENT_DIR = os.path.dirname(__file__)
 
@@ -50,15 +51,29 @@ def new_self_graph(request):
 	return JsonResponse({'code': 200, 'graph_id': graph_id})
 
 
-def get_self_group_info(request):
+def get_self_graph_info(request):
 	data = json.loads(request.body.decode('utf-8'))
 	user_id = data["user_id"]
 	try:
-		graph_info_list = get_group_info(user_id)
+		graph_info_list = get_graph_info(user_id)
+		print(graph_info_list)
 	except Exception as e:
 		print(f"出错了{e}")
 		return JsonResponse({'code': 0, 'msg': "获取自有图谱信息出现异常，具体错误：" + str(e)})
 	return JsonResponse({'code': 200, 'graph_info_list': graph_info_list, 'total': len(graph_info_list)})
+
+def save_self_graph_info(request):
+	data = json.loads(request.body.decode('utf-8'))
+	user_id = data["user_id"]
+	graph_id = data["graph_id"]
+	name = data["name"]
+	description = data["description"]
+	try:
+		save_group_info(user_id, graph_id, name, description)
+	except Exception as e:
+		print(f"出错了{e}")
+		return JsonResponse({'code': 0, 'msg': "更新自有图谱信息出现异常，具体错误：" + str(e)})
+	return JsonResponse({'code': 200})
 
 
 def get_self_entity_info(request):
@@ -71,6 +86,22 @@ def get_self_entity_info(request):
 		print(f"出错了{e}")
 		return JsonResponse({'code': 0, 'msg': "获取图谱节点出现异常，具体错误：" + str(e)})
 	return JsonResponse({'code': 200, 'entity_info_list': entity_info_list, 'total': len(entity_info_list)})
+
+def save_self_entity_info(request):
+	data = json.loads(request.body.decode('utf-8'))
+	user_id = data["user_id"]
+	graph_id = data["graph_id"]
+	entity_id = data["entity_id"]
+	entity = data["entity"]
+	imgurl =data["imgurl"]
+	relatedtype = data["relatedtype"]
+	abstract = data["abstract"]
+	try:
+		save_self_entity(user_id, graph_id, entity, imgurl, relatedtype, abstract, entity_id)
+	except Exception as e:
+		print(f"出错了{e}")
+		return JsonResponse({'code': 0, 'msg': "更新自有图谱信息出现异常，具体错误：" + str(e)})
+	return JsonResponse({'code': 200})
 
 
 def get_self_relation_info(request):
@@ -85,7 +116,7 @@ def get_self_relation_info(request):
 	return JsonResponse({'code': 200, 'relation_info_list': relation_info_list, 'total': len(relation_info_list)})
 
 
-def get_self_group(request):
+def get_self_graph(request):
 	data = json.loads(request.body.decode('utf-8'))
 	graph_id = data["graph_id"]
 	print(graph_id)

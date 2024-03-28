@@ -44,7 +44,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="success" @click="saveGraph()">提交</el-button>
+                <el-button type="success" @click="saveGraphInfo()">提交</el-button>
                 <el-button type="primary" @click="dialogVisible = false">取消</el-button>
             </span>
         </el-dialog>
@@ -71,10 +71,20 @@ export default {
             total: 0,
             size: 10,
             GraphInfoList: [],
-            graphInfo: {},
+            graphInfo: { id: -1, name: '', description: '' },
             search: '',
             curId: ""
         }
+    },
+    computed: {
+        userId: {
+            get() {
+                return this.$store.state.userId;
+            },
+            set(val) {
+                this.$store.commit("changeUserId", val);
+            },
+        },
     },
     watch: {
         //假如现在是第三页，只有一条数据了。将其删除，就没有第三页了。应该跳到第二页展示出5条数据。
@@ -131,57 +141,64 @@ export default {
             }
         },
 
-        async saveGraph() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/save",
-                //     qs.stringify({
-                //         id: this.graphInfo.id,
-                //         name: this.graphInfo.name,
-                //         type: this.graphInfo.description
-                //     })
-                // );
-                this.dialogVisible = false;
-                this.book = {};
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getGraphInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+        saveGraphInfo() {
+            let that = this;
+            this.$http
+                .post("nasdaq/savegraphinfo/", {
+                    user_id: that.userId,
+                    graph_id: that.graphInfo.id,
+                    name: that.graphInfo.name,
+                    description: that.graphInfo.description,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.dialogVisible = false;
+                        that.graphInfo = { id: -1, name: '', description: '' };
+                        that.getGraphInfoList();
+                        that.$message({
+                            message: "数据更新成功!",
+                            type: 'success'
+                        });
+                    } else {
+                        //失败的提示！
+                        that.$message("数据更新失败");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("后端更新数据出现异常!");
+                });
         },
 
-    getGraphInfoList() {
-      let that = this;
-      this.$http
-        .post("nasdaq/graphinfolist/", {
-          user_id: 1,
-        })
-        .then(function (res) {
-          if (res.data.code === 200) {
-            that.GraphInfoList = res.data['graph_info_list']
-            that.total = res.data['total']
-            //         page: this.page,
-            //         size: this.size
-            that.dialogVisible = false;
-            
-          } else {
-            //失败的提示！
-            that.$message("暂无数据");
-          }
-        })
-        .catch(function (err) {
-          console.log(err);
-          that.$message.error("获取后端查询结果出现异常!");
-        });
-    },
+        getGraphInfoList() {
+            let that = this;
+            this.$http
+                .post("nasdaq/graphinfolist/", {
+                    user_id: that.userId,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.GraphInfoList = res.data['graph_info_list']
+                        that.total = res.data['total']
+                        //         page: this.page,
+                        //         size: this.size
+                        that.dialogVisible = false;
 
-    enterGraph(index, row) {
-        console.log(row.id)
-        this.$emit('enter-graph', { activeName: "activeentiey", graph_id: row.id });
-    },
+                    } else {
+                        //失败的提示！
+                        that.$message("暂无数据");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("获取后端查询结果出现异常!");
+                });
+        },
+
+        enterGraph(index, row) {
+            console.log(row.id)
+            this.$emit('enter-graph', { activeName: "activeentiey", graph_id: row.id });
+        },
 
         // handleDelete(index, row) {
         //     console.log(index, row);

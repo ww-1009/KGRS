@@ -39,7 +39,6 @@
 
 <script>
 // import {postRequest} from "../utils/api";
-
 export default {
   name: "Login",
   // data(){
@@ -104,6 +103,16 @@ export default {
       }
     }
   },
+  computed: {
+    userId: {
+      get() {
+        return this.$store.state.userId;
+      },
+      set(val) {
+        this.$store.commit("changeUserId", val);
+      },
+    },
+  },
 
   methods:{
     // updateCaptcha(){
@@ -134,6 +143,7 @@ export default {
           //         this.$router.replace('/home')
           //       }
           //     })
+          this.userId = 1;
           this.$router.replace('/home')
         } else {
           alert('error submit!!');

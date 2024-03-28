@@ -79,10 +79,10 @@ WSGI_APPLICATION = 'IE2_BE.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fd_dg',
+        'NAME': 'FD_dg',
         'USER': 'root',
         'PASSWORD': 'ww20011009',
-        'HOST': '127.0.0.1',   # Or an IP Address that your DB is hosted on
+        'HOST': '10.244.196.151',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
 }

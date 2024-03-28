@@ -192,27 +192,39 @@ export default {
                 });
         },
 
-        async saveRelation() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/save",
-                //     qs.stringify({
-                //         id: this.graphInfo.id,
-                //         name: this.graphInfo.name,
-                //         type: this.graphInfo.description
-                //     })
-                // );
-                this.dialogVisible = false;
-                this.relationInfo = {};
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getRelationInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+        saveRelationInfo() {
+            let that = this;
+            this.$http
+                .post("nasdaq/saverelationinfo/", {
+                    user_id: that.userId,
+                    graph_id: that.activeGraphId,
+                    id: that.relationInfo.id,
+                    id_s: that.relationInfo.id_s,
+                    s: that.relationInfo.s,
+                    p: that.relationInfo.img_url,
+                    o: that.relationInfo.abstract,
+                    id_o: that.relationInfo.relatedType,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.dialogVisible = false;
+                        that.graphInfo = { entity_id: -1, id: -1, entity: '', img_url: '', relatedType: [], abstract: '' };
+                        that.getEntityInfoList();
+                        that.$message({
+                            message: "数据更新成功!",
+                            type: 'success'
+                        });
+                    } else {
+                        //失败的提示！
+                        that.$message("数据更新失败");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("后端更新数据出现异常!");
+                });
         },
+
 
         handleDelete(index, row) {
             console.log(index, row);

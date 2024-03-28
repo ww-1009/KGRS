@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    userId: 1,
     inputStr: "",
     value: "1",
     name:"",
@@ -28,6 +29,9 @@ export default new Vuex.Store({
     first:false,
   },
   mutations: {
+    changeUserId(state,item){
+      state.userId=item
+    },
     changeInputStr(state,item){
       state.inputStr=item
     },
