@@ -76,6 +76,7 @@ class SelfRelation(models.Model):
     id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField()
     graph_id = models.IntegerField()
+    relation_id = models.IntegerField()
     id_s = models.IntegerField(db_column='id_S', blank=True, null=True)  # Field name made lowercase.
     s = models.CharField(db_column='S', max_length=255, blank=True, null=True)  # Field name made lowercase.
     p = models.CharField(db_column='P', max_length=255, blank=True, null=True)  # Field name made lowercase.

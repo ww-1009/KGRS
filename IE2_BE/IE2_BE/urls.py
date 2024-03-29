@@ -28,5 +28,6 @@ urlpatterns = [
 	path('nasdaq/selfgraph/', views.get_self_graph),
 	path('nasdaq/savegraphinfo/', views.save_self_graph_info),
 	path('nasdaq/saveentityinfo/', views.save_self_entity_info),
+	path('nasdaq/saverelationinfo/', views.save_self_relation_info),
 
 ]

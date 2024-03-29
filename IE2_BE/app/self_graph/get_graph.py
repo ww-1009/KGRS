@@ -33,17 +33,16 @@ def get_self_entity(graph_id):
 def get_self_relation(graph_id):
     relation_info_list = []
     self_relation_info = SelfRelation.objects.filter(graph_id=graph_id, deleted=0)
-    self_relation_info_datas = self_relation_info.values("id", "id_s", "s", "p", "o", "id_o")
+    self_relation_info_datas = self_relation_info.values("relation_id", "id_s", "s", "p", "o", "id_o")
     for relation_info in self_relation_info_datas:
-        temp_dic = {'id': relation_info['id'], 'id_s': relation_info["id_s"], 's': relation_info['s'],
+        temp_dic = {'id': relation_info['relation_id'], 'id_s': relation_info["id_s"], 's': relation_info['s'],
                     'p': relation_info['p'], 'o': relation_info['o'], 'id_o': relation_info['id_o']}
         relation_info_list.append(temp_dic)
 
     return relation_info_list
 
 
-def get_self_graph(entity_info_list, relation_info_list, entity_id_map):
-    print(entity_info_list)
+def build_self_graph(entity_info_list, relation_info_list, entity_id_map):
     entity_node = []
     entity_relation = []
     entity_info_all = {}

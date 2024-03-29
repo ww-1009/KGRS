@@ -48,7 +48,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="success" @click="saveRelation()">提交</el-button>
+                <el-button type="success" @click="saveRelationInfo()">提交</el-button>
                 <el-button type="primary" @click="dialogVisible = false">取消</el-button>
             </span>
         </el-dialog>
@@ -78,18 +78,21 @@ export default {
             total: 3,
             size: 10,
 
-            relationInfoList: [{
-                id: 0,
-                id_s: 0,
-                s: '贾宝玉',
-                p: '爱人',
-                o: '林黛玉',
-                id_o: 1
-            }],
-            relationInfo: {},
+            relationInfoList: [],
+            relationInfo: {id:-1, id_s:-1, s:'', p:'', o:'', id_o:-1},
             search: '',
             curId: ''
         }
+    },
+    computed: {
+        userId: {
+            get() {
+                return this.$store.state.userId;
+            },
+            set(val) {
+                this.$store.commit("changeUserId", val);
+            },
+        },
     },
     watch: {
         //假如现在是第三页，只有一条数据了。将其删除，就没有第三页了。应该跳到第二页展示出5条数据。
@@ -198,18 +201,18 @@ export default {
                 .post("nasdaq/saverelationinfo/", {
                     user_id: that.userId,
                     graph_id: that.activeGraphId,
-                    id: that.relationInfo.id,
+                    relation_id: that.relationInfo.id,
                     id_s: that.relationInfo.id_s,
                     s: that.relationInfo.s,
-                    p: that.relationInfo.img_url,
-                    o: that.relationInfo.abstract,
-                    id_o: that.relationInfo.relatedType,
+                    p: that.relationInfo.p,
+                    o: that.relationInfo.o,
+                    id_o: that.relationInfo.id_o,
                 })
                 .then(function (res) {
                     if (res.data.code === 200) {
                         that.dialogVisible = false;
-                        that.graphInfo = { entity_id: -1, id: -1, entity: '', img_url: '', relatedType: [], abstract: '' };
-                        that.getEntityInfoList();
+                        that.relationInfo = {id:-1, id_s:-1, s:'', p:'', o:'', id_o:-1};
+                        that.getRelationInfoList();
                         that.$message({
                             message: "数据更新成功!",
                             type: 'success'
