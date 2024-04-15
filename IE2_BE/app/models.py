@@ -57,15 +57,15 @@ class FdTop5(models.Model):
 class SelfEntity(models.Model):
     entity = models.CharField(max_length=255, blank=True, null=True)
     imgurl = models.CharField(db_column='imgUrl', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    relatedtype = models.CharField(db_column='relatedType', max_length=255, blank=True,
-                                   null=True)  # Field name made lowercase.
-    abstract = models.CharField(max_length=255, blank=True, null=True)
+    relatedtype = models.TextField(db_column='relatedType', blank=True, null=True)  # Field name made lowercase.
+    abstract = models.TextField(blank=True, null=True)
     update_time = models.DateTimeField(blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
     user_id = models.IntegerField()
     graph_id = models.IntegerField()
     entity_id = models.IntegerField()
     deleted = models.IntegerField(blank=True, null=True)
+    iscollect = models.IntegerField(db_column='isCollect', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

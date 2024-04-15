@@ -16,7 +16,8 @@
             <br>
             <el-descriptions-item label="简介">{{entityInfo.abstract}}</el-descriptions-item>
         </el-descriptions> 
-        </div>
+        <i class="fr " style="font-size: 30px; color: gold;" v-bind:class="isCollect ? 'el-icon-star-on importicon':'el-icon-star-off'" @click.stop="changeStart()"></i>
+    </div>
 </template>
 
 <script>
@@ -27,8 +28,14 @@ export default {
     data() {
         return {
             src: '',
+            isCollect: false,
         };
     },
-    methods: {},
+    methods: {
+        changeStart(){
+            this.isCollect = !this.isCollect;
+           
+        },
+    },
 };
 </script>

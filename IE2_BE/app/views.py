@@ -144,12 +144,41 @@ def get_self_graph(request):
     try:
         entity_info_list, entity_id_map = get_self_entity(graph_id)
         relation_info_list = get_self_relation(graph_id)
-        entity_node, entity_relation, entity_info_all = build_self_graph(entity_info_list, relation_info_list, entity_id_map)
+        entity_node, entity_relation, entity_info_all = build_self_graph(entity_info_list, relation_info_list,
+                                                                         entity_id_map)
     except Exception as e:
         print(f"出错了{e}")
         return JsonResponse({'code': 0, 'msg': "获取自有图谱出现异常，具体错误：" + str(e)})
     return JsonResponse({'code': 200, 'entity_node': entity_node, 'entity_relation': entity_relation,
                          'entity_info_all': entity_info_all})
+
+
+def get_collect_list(request):
+    data = json.loads(request.body.decode('utf-8'))
+    user_id = data["user_id"]
+    graph_map = {}
+    collect_info_list = []
+    try:
+        self_entity_info = SelfEntity.objects.filter(user_id=user_id, iscollect=1, deleted=0)
+        self_entity_info_datas = self_entity_info.values("entity_id", "graph_id", "entity", "imgurl", "relatedtype",
+                                                         "abstract").order_by('graph_id')
+        for self_entity_info in self_entity_info_datas:
+            graph_id = self_entity_info["graph_id"]
+            if graph_id not in graph_map:
+                self_group_object = SelfGraphInfo.objects.filter(graph_id=graph_id, deleted=0) \
+                    .values('graph_name').first()
+                graph_map[graph_id] = self_group_object['graph_name']
+            relatedtype_list = self_entity_info['relatedtype'].split(";")
+            temp_dic = {"entity_id": self_entity_info["entity_id"],
+                        "entity": self_entity_info["entity"], "img_url": self_entity_info["imgurl"],
+                        'relatedType': relatedtype_list, 'abstract': self_entity_info["abstract"],
+                        "graph_name": graph_map[graph_id], 'graph_id': graph_id}
+            collect_info_list.append(temp_dic)
+        print(collect_info_list)
+    except Exception as e:
+        print(f"出错了{e}")
+        return JsonResponse({'code': 0, 'msg': "获取收藏信息出现异常，具体错误：" + str(e)})
+    return JsonResponse({'code': 200, 'collect_info_list': collect_info_list})
 
 
 def getnewstop(request):
@@ -167,7 +196,6 @@ def getnewstop(request):
             img.append(f.readline())
         f.close()
         datas.append(tops)
-        # print(tops)
         datas.append(img)
         return JsonResponse({'code': 1, 'data': datas})
     except Exception as e:
