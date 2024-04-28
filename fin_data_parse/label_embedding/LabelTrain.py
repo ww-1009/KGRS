@@ -16,13 +16,4 @@ model = node2vec.fit(window=8, min_count=1, batch_words=4)
 print("训练完成")
 
 # 保存Node2Vec模型
-model.wv.save_word2vec_format("node2vec_model16.bin", binary=True)
-# model.save("node2vec.model")
-#
-# # 保存节点到索引的映射
-# import json
-#
-# node_to_index = {node: idx for idx, node in enumerate(G.nodes())}
-# with open("node_to_index.json", "w") as f:
-#     json.dump(node_to_index, f)
-# print("保存成功")
+model.wv.save_word2vec_format("node2vec_model32.bin", binary=True)

@@ -95,46 +95,6 @@ def load_model(model, path):
     model.load_state_dict(torch.load(path))
 
 
-# def get_related_entities(model, entity_id):
-#     # 将实体id转换为张量
-#     node_pairs_tensor = torch.tensor([[entity_id, neighbor_id] for neighbor_id in range(len(entity_datas))], dtype=torch.long).to(device)
-#     # print("entity_id_tensor:", node_pairs_tensor.shape)
-#
-#     # 使用模型预测相关实体id
-#     prediction = model(data.x, data.edge_index, node_pairs_tensor)
-#     # print("prediction:",prediction.shape)
-#
-#     # 使用循环找到张量中数值最大的5个元素及其值
-#     values = []
-#     indices = []
-#     for i in range(len(prediction)):
-#         if len(values) < 5:
-#             values.append(prediction[i])
-#             indices.append(i)
-#         else:
-#             min_value = min(values)
-#             min_index = values.index(min_value)
-#             if prediction[i] > min_value:
-#                 values[min_index] = prediction[i]
-#                 indices[min_index] = i
-#
-#     top_dic = {}
-#     # 打印值和索引
-#     for value, index in zip(values, indices):
-#         top_dic[index] = value.item()
-#     # 将字典转换为列表
-#     top_list = list(top_dic.items())
-#     # 根据字典的值进行降序排序
-#     sorted_list = sorted(top_list, key=lambda x: x[1], reverse=True)
-#     # 将排序后的列表转换为字典
-#     sorted_dict = dict(sorted_list)
-#     print(sorted_dict)
-#     prediction_list = [entity_id]
-#     for key, value in sorted_dict.items():
-#         prediction_list.append(key)
-#         prediction_list.append(value)
-#     # 返回预测结果
-#     return tuple(prediction_list)
 def get_related_entities(model, entity_id, related_id_list):
     # 将实体id转换为张量
     node_pairs_tensor = torch.tensor([[entity_id, neighbor_id] for neighbor_id in range(len(entity_datas))], dtype=torch.long).to(device)
