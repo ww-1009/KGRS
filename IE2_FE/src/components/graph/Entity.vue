@@ -35,7 +35,7 @@
       <el-col :span="7">
         <el-card style="height: 850px"> 
           <Myimage v-if="!entitydetail"></Myimage>
-          <Entitydetail v-if="entitydetail" :entityInfo="entityInfo"></Entitydetail>
+          <Entitydetail v-if="entitydetail" :entityInfo="entityInfo" :isSelf="false"></Entitydetail>
         </el-card>
       </el-col>
     </el-row>

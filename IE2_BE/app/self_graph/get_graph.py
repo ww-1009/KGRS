@@ -19,13 +19,13 @@ def get_self_entity(graph_id):
     entity_info_list = []
     entity_id_map = {}
     self_entity_info = SelfEntity.objects.filter(graph_id=graph_id, deleted=0)
-    self_entity_info_datas = self_entity_info.values("entity_id", "entity", "imgurl", "relatedtype", "abstract")
+    self_entity_info_datas = self_entity_info.values("entity_id", "entity", "imgurl", "relatedtype", "abstract", "iscollect")
     for entity_info in self_entity_info_datas:
         entity_id_map[entity_info["entity_id"]] = len(entity_id_map)
         relatedtype_list = entity_info['relatedtype'].split(";")
         temp_dic = {"entity_id": entity_info["entity_id"], "id": len(entity_id_map), "entity": entity_info["entity"],
                     "img_url": entity_info["imgurl"], 'relatedType': relatedtype_list,
-                    'abstract': entity_info["abstract"]}
+                    'abstract': entity_info["abstract"], 'iscollect': entity_info["iscollect"]}
         entity_info_list.append(temp_dic)
     return entity_info_list, entity_id_map
 

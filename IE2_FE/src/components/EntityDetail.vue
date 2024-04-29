@@ -16,7 +16,7 @@
             <br>
             <el-descriptions-item label="简介">{{entityInfo.abstract}}</el-descriptions-item>
         </el-descriptions> 
-        <i class="fr " style="font-size: 30px; color: gold;" v-bind:class="isCollect ? 'el-icon-star-on importicon':'el-icon-star-off'" @click.stop="changeStart()"></i>
+        <i class="fr " v-if=isSelf style="font-size: 30px; color: gold;" v-bind:class="entityInfo.iscollect ? 'el-icon-star-on importicon':'el-icon-star-off'" @click.stop="changeStart()"></i>
     </div>
 </template>
 
@@ -24,18 +24,42 @@
 export default {
     props: {
         entityInfo: {},
+        isSelf: true,
+        activeGraphId: 0
     },
     data() {
         return {
             src: '',
-            isCollect: false,
         };
     },
     methods: {
         changeStart(){
-            this.isCollect = !this.isCollect;
-           
+            console.log(this.activeGraphId)
+            let that = this;
+            this.$http
+                .post("nasdaq/changecollect/", {
+                    graph_id: that.graphInfo.id,
+                    iscollect: that.entityInfo.iscollect
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.entityInfo.iscollect = res.data['iscollect'];
+                        that.$message({
+                            message: "数据更新成功!",
+                            type: 'success'
+                        });
+                    } else {
+                        //失败的提示！
+                        that.$message("数据更新失败");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("后端更新数据出现异常!");
+                });
+
         },
+
     },
 };
 </script>

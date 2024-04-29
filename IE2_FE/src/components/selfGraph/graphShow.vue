@@ -161,7 +161,6 @@ export default {
             // this.Mychart.off('click')
             this.Mychart.on('mouseover', function (params) {
                 if (params.dataType == "node") {
-                    console.log(entityInfoAll[params.data["id"]])
                     that.$emit('entity-info', { entityInfo: entityInfoAll[params.data["id"]]});
                     // that.entityInfo = that.entityInfoAll[params.data["id"]];
                     // console.log(that.entityInfo)

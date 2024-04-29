@@ -30,5 +30,6 @@ urlpatterns = [
 	path('nasdaq/saveentityinfo/', views.save_self_entity_info),
 	path('nasdaq/saverelationinfo/', views.save_self_relation_info),
 	path('nasdaq/collectinfolist/', views.get_collect_list),
+	path('nasdaq/changecollect/', views.change_collect),
 
 ]

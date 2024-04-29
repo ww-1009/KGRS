@@ -22,7 +22,7 @@
             </el-col>
             <el-col :span="7">
                 <el-card style="height: 800px">
-                  <Entitydetail v-if="activeName == 'activeshow'" :entityInfo="entityInfo"></Entitydetail>
+                  <Entitydetail v-if="activeName == 'activeshow'" :entityInfo="entityInfo" :isSelf="true" :activeGraphId="activeGraphId"></Entitydetail>
                 </el-card>
             </el-col>
         </el-row>

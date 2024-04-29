@@ -56,7 +56,6 @@ def get_self_graph_info(request):
     user_id = data["user_id"]
     try:
         graph_info_list = get_graph_info(user_id)
-        print(graph_info_list)
     except Exception as e:
         print(f"出错了{e}")
         return JsonResponse({'code': 0, 'msg': "获取自有图谱信息出现异常，具体错误：" + str(e)})
@@ -80,7 +79,6 @@ def save_self_graph_info(request):
 def get_self_entity_info(request):
     data = json.loads(request.body.decode('utf-8'))
     graph_id = data["graph_id"]
-    print(graph_id)
     try:
         entity_info_list, entity_id_map = get_self_entity(graph_id)
     except Exception as e:
@@ -109,7 +107,6 @@ def save_self_entity_info(request):
 def get_self_relation_info(request):
     data = json.loads(request.body.decode('utf-8'))
     graph_id = data["graph_id"]
-    print(graph_id)
     try:
         relation_info_list = get_self_relation(graph_id)
     except Exception as e:
@@ -128,7 +125,6 @@ def save_self_relation_info(request):
     p = data["p"]
     o = data["o"]
     id_o = data["id_o"]
-    print(graph_id)
     try:
         save_self_relation(user_id, graph_id, relation_id, id_s, s, p, o, id_o)
     except Exception as e:
@@ -140,7 +136,6 @@ def save_self_relation_info(request):
 def get_self_graph(request):
     data = json.loads(request.body.decode('utf-8'))
     graph_id = data["graph_id"]
-    print(graph_id)
     try:
         entity_info_list, entity_id_map = get_self_entity(graph_id)
         relation_info_list = get_self_relation(graph_id)
@@ -174,12 +169,22 @@ def get_collect_list(request):
                         'relatedType': relatedtype_list, 'abstract': self_entity_info["abstract"],
                         "graph_name": graph_map[graph_id], 'graph_id': graph_id}
             collect_info_list.append(temp_dic)
-        print(collect_info_list)
     except Exception as e:
         print(f"出错了{e}")
         return JsonResponse({'code': 0, 'msg': "获取收藏信息出现异常，具体错误：" + str(e)})
     return JsonResponse({'code': 200, 'collect_info_list': collect_info_list})
 
+def change_collect(request):
+    data = json.loads(request.body.decode('utf-8'))
+    graph_id = data["graph_id"]
+    iscollect = data["iscollect"]
+    try:
+        iscollect = iscollect ? 0 : 1
+        SelfEntity.objects.filter(graph_id=graph_id).update(iscollect=iscollect)
+    except Exception as e:
+        print(f"出错了{e}")
+        return JsonResponse({'code': 0, 'msg': "修改收藏状态出现异常，具体错误：" + str(e)})
+    return JsonResponse({'code': 200, 'iscollect': iscollect})
 
 def getnewstop(request):
     try:

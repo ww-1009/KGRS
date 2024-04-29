@@ -146,7 +146,6 @@ export default {
                 .then(function (res) {
                     if (res.data.code === 200) {
                         that.collectInfoList = res.data['collect_info_list']
-                        console.log(that.collectInfoList)
                         //         page: this.page,
                         //         size: this.size
                         that.dialogVisible = false;
