@@ -35,7 +35,7 @@ export default {
             let that = this;
             this.$http
                 .post("nasdaq/selfgraph/", {
-                    graph_id: 1,
+                    graph_id: that.activeGraphId,
                 })
                 .then(function (res) {
                     if (res.data.code === 200) {

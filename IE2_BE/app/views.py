@@ -76,6 +76,16 @@ def save_self_graph_info(request):
     return JsonResponse({'code': 200})
 
 
+def del_self_graph(request):
+    data = json.loads(request.body.decode('utf-8'))
+    graph_id = data["graph_id"]
+    try:
+        SelfGraphInfo.objects.filter(graph_id=graph_id).update(deleted=1)
+    except Exception as e:
+        print(f"出错了{e}")
+        return JsonResponse({'code': 0, 'msg': "删除自有图谱出现异常，具体错误：" + str(e)})
+    return JsonResponse({'code': 200})
+
 def get_self_entity_info(request):
     data = json.loads(request.body.decode('utf-8'))
     graph_id = data["graph_id"]
@@ -103,6 +113,15 @@ def save_self_entity_info(request):
         return JsonResponse({'code': 0, 'msg': "更新自有图谱信息出现异常，具体错误：" + str(e)})
     return JsonResponse({'code': 200})
 
+def del_self_entity(request):
+    data = json.loads(request.body.decode('utf-8'))
+    id = data["id"]
+    try:
+        SelfEntity.objects.filter(id=id).update(deleted=1)
+    except Exception as e:
+        print(f"出错了{e}")
+        return JsonResponse({'code': 0, 'msg': "删除实体出现异常，具体错误：" + str(e)})
+    return JsonResponse({'code': 200})
 
 def get_self_relation_info(request):
     data = json.loads(request.body.decode('utf-8'))
@@ -132,6 +151,15 @@ def save_self_relation_info(request):
         return JsonResponse({'code': 0, 'msg': "获取图谱节点出现异常，具体错误：" + str(e)})
     return JsonResponse({'code': 200})
 
+def del_self_relation(request):
+    data = json.loads(request.body.decode('utf-8'))
+    id = data["id"]
+    try:
+        SelfRelation.objects.filter(id=id).update(deleted=1)
+    except Exception as e:
+        print(f"出错了{e}")
+        return JsonResponse({'code': 0, 'msg': "删除实体关系出现异常，具体错误：" + str(e)})
+    return JsonResponse({'code': 200})
 
 def get_self_graph(request):
     data = json.loads(request.body.decode('utf-8'))
@@ -146,6 +174,7 @@ def get_self_graph(request):
         return JsonResponse({'code': 0, 'msg': "获取自有图谱出现异常，具体错误：" + str(e)})
     return JsonResponse({'code': 200, 'entity_node': entity_node, 'entity_relation': entity_relation,
                          'entity_info_all': entity_info_all})
+
 
 
 def get_collect_list(request):
@@ -177,10 +206,11 @@ def get_collect_list(request):
 def change_collect(request):
     data = json.loads(request.body.decode('utf-8'))
     graph_id = data["graph_id"]
+    entity_id = data["entity_id"]
     iscollect = data["iscollect"]
     try:
-        iscollect = iscollect ? 0 : 1
-        SelfEntity.objects.filter(graph_id=graph_id).update(iscollect=iscollect)
+        iscollect = 0 if iscollect else 1
+        SelfEntity.objects.filter(graph_id=graph_id, entity_id=entity_id).update(iscollect=iscollect)
     except Exception as e:
         print(f"出错了{e}")
         return JsonResponse({'code': 0, 'msg': "修改收藏状态出现异常，具体错误：" + str(e)})

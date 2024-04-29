@@ -13,9 +13,9 @@
                     <el-input v-model="search" size="mini" placeholder="输入关键字搜索" />
                 </template>
                 <template slot-scope="scope">
-                    <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+                    <el-button size="mini" @click="editCollectInfo(scope.$index, scope.row)">Edit</el-button>
                     <el-button size="mini" type="danger"
-                        @click="handleDelete(scope.$index, scope.row)">Delete</el-button>
+                        @click="delCollect(scope.row)">Delete</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -23,6 +23,39 @@
             :page-sizes="[5, 10, 20]" :page-size="size" style="float:right"
             layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
+        <el-dialog :title="addFlag ? '新增实体' : '修改实体'" style="text-align:left !important" :visible.sync="dialogVisible"
+            :before-close="handleClose">
+            <el-form ref="form" label-width="80px">
+                <el-form-item label="实体名称" style="width:250px">
+                    <el-input v-model="collectInfo.entity" placeholder="请输入实体名称"></el-input>
+                </el-form-item>
+                <el-form-item label="实体类型" style="width:500px">
+                    <el-tag :key="tag" v-for="tag in collectInfo.relatedType" closable :disable-transitions="false"
+                        @close="tarClose(tag)">
+                        {{ tag }}
+                    </el-tag>
+                    <el-input class="input-new-tag" v-if="tarinputVisible" v-model="tarinputValue" ref="saveTagInput"
+                        size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
+                    </el-input>
+                    <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+                </el-form-item>
+                <el-form-item label="实体描述" style="width:500px">
+                    <el-input v-model="collectInfo.abstract" type="textarea" :rows="3" placeholder="请输入实体描述"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="success" @click="saveCollectInfo()">提交</el-button>
+                <el-button type="primary" @click="dialogVisible = false">取消</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="提示" style="text-align:left !important" :visible.sync="dialog2Visible"
+            :before-close="handleClose">
+            <span>你确定要取消收藏这个实体吗?</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="handleDel()">提交</el-button>
+                <el-button type="primary" @click="dialog2Visible = false">取消</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -37,10 +70,12 @@ export default {
             page: 1,
             total: 0,
             size: 10,
+
+            tarinputVisible: false,
+            tarinputValue: '',
             collectInfoList: [],
             collectInfo: {},
             search: '',
-            curId: ""
         }
     },
     computed: {
@@ -75,52 +110,63 @@ export default {
             this.page = val;
             this.getCollectInfoList();
         },
-        // editGraphInfo(index, row) {
-        //     console.log(index, row);
-        //     this.graphInfo = row;
-        //     this.dialogVisible = true;
-        //     this.addFlag = false;
-        // },
+
+        editCollectInfo(index, row) {
+            this.collectInfo = row;
+            this.dialogVisible = true;
+            this.addFlag = false;
+
+        },
 
         delCollect(row) {
-            console.log(row)
             this.addFlag = false;
             this.dialog2Visible = true;
-            this.curId = row.id;
+            this.collectInfo = row
         },
-        async handleDel() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/del",
-                //     qs.stringify({
-                //         id: this.curId
-                //     })
-                // );
-                this.curId = "";
-                this.dialog2Visible = false;
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getCollectInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+
+        handleDel() {
+            let that = this;
+            this.$http
+                .post("nasdaq/changecollect/", {
+                    graph_id: that.collectInfo.graph_id,
+                    entity_id: that.collectInfo.entity_id,
+                    iscollect: 1
+                })
+            .then(function (res) {
+                if (res.data.code === 200) {
+                    that.dialog2Visible = false;
+                    that.getCollectInfoList();
+                    that.$message({
+                        message: "取消收藏成功",
+                        type: 'success'
+                    });
+                } else {
+                    //失败的提示！
+                    that.$message("数据更新失败");
+                }
+            })
+            .catch(function (err) {
+                console.log(err);
+                that.$message.error("后端更新数据出现异常!");
+            });
         },
 
         saveCollectInfo() {
             let that = this;
             this.$http
-                .post("nasdaq/savegraphinfo/", {
+                .post("nasdaq/saveentityinfo/", {
                     user_id: that.userId,
-                    graph_id: that.graphInfo.id,
-                    name: that.graphInfo.name,
-                    description: that.graphInfo.description,
+                    graph_id: that.collectInfo.graph_id,
+                    entity_id: that.collectInfo.entity_id,
+                    entity: that.collectInfo.entity,
+                    imgurl: that.collectInfo.img_url,
+                    abstract: that.collectInfo.abstract,
+                    relatedtype: that.collectInfo.relatedType,
                 })
                 .then(function (res) {
                     if (res.data.code === 200) {
                         that.dialogVisible = false;
-                        that.collectInfo = {};
+                        that.entityInfo = { entity_id: -1, id: -1, entity: '', img_url: '', relatedType: [], abstract: '' };
                         that.getCollectInfoList();
                         that.$message({
                             message: "数据更新成功!",

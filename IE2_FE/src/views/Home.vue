@@ -29,10 +29,10 @@
             <i class="el-icon-share"></i>
             <span slot="title">实体关系图</span>
           </el-menu-item>
-           <el-menu-item index="/type">
+           <!-- <el-menu-item index="/type">
             <i class="el-icon-menu"></i>
             <span slot="title">类型关系图</span>
-          </el-menu-item>
+          </el-menu-item> -->
           <!-- <el-menu-item index="/porperty">
             <i class="el-icon-orange"></i>
             <span slot="title">属性图</span>
@@ -130,7 +130,6 @@ export default {
           if (res.data.code === 1) {
             that.newstop = res.data.data[0];
             that.newsimg=res.data.data[1];
-            console.log(that.newstop);
             //提示：
           } else {
             //失败的提示！

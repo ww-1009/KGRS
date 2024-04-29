@@ -7,8 +7,8 @@
                         <el-tab-pane label="图谱信息" name="activeinfo">
                             <InfoTable v-if="activeName == 'activeinfo'" ref="activeinfo" @enter-graph="enterGraph"></InfoTable>
                         </el-tab-pane>
-                        <el-tab-pane label="实体信息" name="activeentiey" :disabled="isDisabled">
-                            <EntityTable v-if="activeName == 'activeentiey'" ref="activeentiey" :activeGraphId="activeGraphId"></EntityTable>
+                        <el-tab-pane label="实体信息" name="activeentity" :disabled="isDisabled">
+                            <EntityTable v-if="activeName == 'activeentity'" ref="activeentity" :activeGraphId="activeGraphId"></EntityTable>
                         </el-tab-pane>
                         <el-tab-pane label="实体关系" name="activerelation" :disabled="isDisabled">
                             <RelationTable v-if="activeName == 'activerelation'" ref="activerelation" :activeGraphId="activeGraphId"></RelationTable>
@@ -74,6 +74,7 @@ export default {
         this.isDisabled = false;
         this.activeName = data.activeName;
         this.activeGraphId = data.graph_id;
+        console.log(this.activeGraphId)
         // this.getSelfGraph();
       },
 

@@ -3,7 +3,7 @@
         <el-table
             :data="relationInfoList.filter(data => !search || data.s.toLowerCase().includes(search.toLowerCase()))"
             style="width: 100%">
-            <el-table-column label="id" prop="id" width="80">
+            <el-table-column label="id" prop="relation_id" width="80">
             </el-table-column>
             <el-table-column label="主语" prop="s" width="100">
             </el-table-column>
@@ -129,50 +129,39 @@ export default {
             this.dialog2Visible = true;
             this.curId = row.id;
         },
-        async handleDel() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/del",
-                //     qs.stringify({
-                //         id: this.curId
-                //     })
-                // );
-                this.curId = "";
-                this.dialog2Visible = false;
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getRelationInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+
+        handleDel() {
+            let that = this;
+            this.$http
+                .post("nasdaq/delrelation/", {
+                    id: that.curId,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.curId = "";
+                        that.dialog2Visible = false;
+                        that.getRelationInfoList();
+                        that.$message({
+                            message: "实体关系删除成功!",
+                            type: 'success'
+                        });
+                    } else {
+                        //失败的提示！
+                        that.$message("数据更新失败");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("后端更新数据出现异常!");
+                });
         },
 
         tarClose(tag) {
             this.relationInfo.type.splice(this.relationInfo.type.indexOf(tag), 1);
         },
 
-        async getRelationInfoList() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/list",
-                //     qs.stringify({
-                //         page: this.page,
-                //         size: this.size
-                //     })
-                // );
-                // this.total = res.data.Data.Total;
-                // this.GraphInfoList = res.data.Data.List;
-                console.log("getBookList");
-            } catch (e) {
-                console.log(e);
-            }
-        },
-
         getRelationInfoList() {
             let that = this;
-            console.log(that.activeGraphId)
             this.$http
                 .post("nasdaq/selfrelationlist/", {
                     graph_id: that.activeGraphId,

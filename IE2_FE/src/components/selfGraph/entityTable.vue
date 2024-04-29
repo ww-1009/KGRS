@@ -123,8 +123,8 @@ export default {
             this.page = val;
             this.getEntityInfoList();
         },
+        
         editEntityInfo(index, row) {
-            console.log(index, row);
             this.entityInfo = row;
             this.dialogVisible = true;
             this.addFlag = false;
@@ -136,24 +136,32 @@ export default {
             this.dialog2Visible = true;
             this.curId = row.id;
         },
-        async handleDel() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/del",
-                //     qs.stringify({
-                //         id: this.curId
-                //     })
-                // );
-                this.curId = "";
-                this.dialog2Visible = false;
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getEntityInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+
+        handleDel() {
+            let that = this;
+            console.log(that.curId)
+            this.$http
+                .post("nasdaq/delentity/", {
+                    id: that.curId,
+                })
+            .then(function (res) {
+                if (res.data.code === 200) {
+                    that.curId = "";
+                    that.dialog2Visible = false;
+                    that.getEntityInfoList();
+                    that.$message({
+                        message: "实体删除成功!",
+                        type: 'success'
+                    });
+                } else {
+                    //失败的提示！
+                    that.$message("数据更新失败");
+                }
+            })
+            .catch(function (err) {
+                console.log(err);
+                that.$message.error("后端更新数据出现异常!");
+            });
         },
 
         tarClose(tag) {
@@ -216,7 +224,7 @@ export default {
                 .then(function (res) {
                     if (res.data.code === 200) {
                         that.dialogVisible = false;
-                        that.graphInfo = { entity_id: -1, id: -1, entity: '', img_url: '', relatedType: [], abstract: '' };
+                        that.entityInfo = { entity_id: -1, id: -1, entity: '', img_url: '', relatedType: [], abstract: '' };
                         that.getEntityInfoList();
                         that.$message({
                             message: "数据更新成功!",

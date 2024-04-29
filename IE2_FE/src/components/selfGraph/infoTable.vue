@@ -116,29 +116,36 @@ export default {
         },
 
         delGraph(row) {
-            console.log(row)
             this.addFlag = false;
             this.dialog2Visible = true;
             this.curId = row.id;
         },
-        async handleDel() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/del",
-                //     qs.stringify({
-                //         id: this.curId
-                //     })
-                // );
-                this.curId = "";
-                this.dialog2Visible = false;
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getGraphInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+        
+        handleDel() {
+            let that = this;
+            console.log(that.curId)
+            this.$http
+                .post("nasdaq/delgraph/", {
+                    graph_id: that.curId,
+                })
+            .then(function (res) {
+                if (res.data.code === 200) {
+                    that.curId = "";
+                    that.dialog2Visible = false;
+                    that.getGraphInfoList();
+                    that.$message({
+                        message: "图谱删除成功!",
+                        type: 'success'
+                    });
+                } else {
+                    //失败的提示！
+                    that.$message("数据更新失败");
+                }
+            })
+            .catch(function (err) {
+                console.log(err);
+                that.$message.error("后端更新数据出现异常!");
+            });
         },
 
         saveGraphInfo() {
@@ -197,7 +204,7 @@ export default {
 
         enterGraph(index, row) {
             console.log(row.id)
-            this.$emit('enter-graph', { activeName: "activeentiey", graph_id: row.id });
+            this.$emit('enter-graph', { activeName: "activeentity", graph_id: row.id });
         },
 
         // handleDelete(index, row) {

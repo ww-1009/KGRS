@@ -23,12 +23,19 @@ urlpatterns = [
 	path('nasdaq/newstop/', views.getnewstop),
 	path('nasdaq/entitydata/', views.get_fd_group),
 	path('nasdaq/graphinfolist/', views.get_self_graph_info),
+
 	path('nasdaq/selfentitylist/', views.get_self_entity_info),
 	path('nasdaq/selfrelationlist/', views.get_self_relation_info),
 	path('nasdaq/selfgraph/', views.get_self_graph),
+
 	path('nasdaq/savegraphinfo/', views.save_self_graph_info),
 	path('nasdaq/saveentityinfo/', views.save_self_entity_info),
 	path('nasdaq/saverelationinfo/', views.save_self_relation_info),
+
+	path('nasdaq/delgraph/', views.del_self_graph),
+	path('nasdaq/delentity/', views.del_self_entity),
+	path('nasdaq/delrelation/', views.del_self_relation),
+
 	path('nasdaq/collectinfolist/', views.get_collect_list),
 	path('nasdaq/changecollect/', views.change_collect),
 

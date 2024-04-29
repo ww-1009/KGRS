@@ -38,7 +38,8 @@ export default {
             let that = this;
             this.$http
                 .post("nasdaq/changecollect/", {
-                    graph_id: that.graphInfo.id,
+                    graph_id: that.activeGraphId,
+                    entity_id: that.entityInfo.entity_id,
                     iscollect: that.entityInfo.iscollect
                 })
                 .then(function (res) {
