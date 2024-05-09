@@ -80,9 +80,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'FD_dg',
-        'USER': 'root',
-        'PASSWORD': 'ww20011009',
-        'HOST': '127.0.0.1',   # Or an IP Address that your DB is hosted on
+        'USER': 'xxxxx', # 填写用户名
+        'PASSWORD': 'xxxxx', # 填写数据库密码
+        'HOST': 'xxxxx',   # 数据库ip地址
         'PORT': '3306',
     }
 }
