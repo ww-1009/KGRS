@@ -1,46 +1,69 @@
 import torch
 import torch.nn.functional as F
 
-# 简单推荐逻辑
 from graph_train.module import ModifiedGCN
+from graph_train.train_tool import get_x, get_node_pairs, load_model
+from lib.GetTrainDate import get_train_data
+from lib.Db_sql import Db
 
-def load_model(model, path):
-    model.load_state_dict(torch.load(path))
+def get_related_entities(model, entity_id, related_id_list):
+    # 将实体id转换为张量
+    node_pairs_tensor = torch.tensor([[entity_id, neighbor_id] for neighbor_id in range(len(entity_datas))],
+                                     dtype=torch.long).to(device)
+    # print("entity_id_tensor:", node_pairs_tensor.shape)
 
-def recommend(entity_id, model, data):
-    with torch.no_grad():
-        logits = model(data)
-        probabilities = F.softmax(logits, dim=1)
-        _, indices = torch.sort(probabilities, descending=True)
-        recommended_id = indices[:, 1]  # 假设推荐概率第二高的类别
-        return recommended_id[entity_id].item()
-
-def get_related_nodes(model, entity_id):
-    # 使用模型预测相关节点id
-    prediction = model(entity_id)
-
+    # 使用模型预测相关实体id
+    prediction = model(data.x, data.edge_index, node_pairs_tensor)
+    # print("prediction:",prediction.shape)
+    related_prediction_dic = {}
+    for related_id in related_id_list:
+        # 找到与指定实体ID相关的预测值
+        related_prediction_dic[related_id] = prediction[related_id].item()
     # 返回预测结果
-    return prediction
+    return related_prediction_dic
+
 
 if __name__ == '__main__':
-    # # 加载模型
-    # model_loaded = ModifiedGCN(input_dim=16, output_dim=1)
-    # model_loaded.load_state_dict(torch.load('gcn_model.pth'))
-    # model_loaded.eval()
-    #
-    # # 示例：推荐实体
-    # entity_id = 2
-    # recommended_id = recommend(entity_id, model_loaded, data)
-    # print(f'Recommended entity ID for entity {entity_id}: {recommended_id}')
-    model = ModifiedGCN(in_channels=16, hidden_channels=32, out_channels=1)
+    entity_datas, relation_datas = get_train_data()
+
+    data = get_x(entity_datas, relation_datas)
+    data = data.to(device)
+
+    node_pairs_tensor, labels_tensor = get_node_pairs(relation_datas, len(entity_datas))
+    node_pairs_tensor = node_pairs_tensor.to(device)
+    labels_tensor = labels_tensor.to(device)
+
+    # 模型和优化器
+    model = ModifiedGCN(in_channels=32, hidden_channels=64, out_channels=1).to(device)
+    optimizer = Adam(model.parameters(), lr=0.01)
+    criterion = BCEWithLogitsLoss()
+
+    model_path = "model32.ckpt"
     # 加载模型
-    model_path = "model.ckpt"
     load_model(model, model_path)
-    # 输入实体id
-    entity_id = 1
 
-    # 获取相关节点id
-    related_nodes = get_related_nodes(model, entity_id)
+    sql_datas = []
+    db = Db('FD_dg')
+    for entity_id in range(47065):
+        relation_id_list = []
+        results = db.select("select id_S, id_O from fd_relation where id_S = '%s' or id_O = '%s'", entity_id, entity_id)
+        sql_data = [entity_id]
+        for item in results:
+            relation_id_list.append(item[0])
+            relation_id_list.append(item[1])
+        relation_id_list = list(set(relation_id_list))
+        relation_id_list.remove(entity_id)
+        # 获取相关实体id
+        related_prediction_dic = get_related_entities(model, entity_id, relation_id_list)
+        # 获取前五大
+        sorted_items = sorted(related_prediction_dic.items(), key=lambda x: x[1], reverse=True)[:5]
+        for key, value in sorted_items:
+            sql_data.append(key)
+            sql_data.append(value)
+        while len(sql_data) < 11:
+            sql_data.extend([-1])
+        # print(sql_data)
+        sql_datas.append(tuple(sql_data))
 
-    # 打印相关节点id
-    print(related_nodes)
+    sql_string = 'insert into fd_top5 (id, top1_id, value1, top2_id, value2,top3_id, value3,top4_id, value4,top5_id, value5) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
+    db.insert_ignore(sql_string, sql_datas)

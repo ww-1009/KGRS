@@ -84,60 +84,6 @@ def getESDate_all():
     print("G.relations的个数：", G.relations_num)
     return G
 
-# def getESDate():
-#     # 创建Elasticsearch客户端
-#     client = elasticsearch.Elasticsearch(["localhost:9200"])
-#     # 搜索所有文档
-#     res = client.search(index="reindex")
-#
-#     G = Graph()
-#     node_help = {}  # id:entity
-#     NoType=0
-#     Nolink = 0
-#     num = 0
-#     # 遍历搜索结果
-#     for hit in res["hits"]["hits"]:
-#         data=hit["_source"]
-#         num = num + 1
-#         print("当前处理",data["id"], data["name"],num)
-#         '''设置relation表数据'''
-#         try:
-#             node = data['node'] # 读取查询数据中的node项
-#             link = data['link'] # 读取查询数据中的link项
-#             # 映射id和entity
-#             for value in node.values():
-#                 for i in value:
-#                     node_help[int(i[0])]=i[1]
-#             '''设置relation'''
-#             for value in link.values():
-#                 for i in value:
-#                     i.insert(2, node_help[int(i[2])])
-#                     i.insert(1, node_help[int(i[0])])
-#                     G.relations.append(tuple(i))
-#         except KeyError:
-#             Nolink = Nolink + 1
-#             # print(data["id"],data["name"],"无node或link")
-#
-#         '''设置entity表数据'''
-#         try:
-#             relatedType = data['relatedType']
-#         except KeyError:
-#             NoType = NoType + 1
-#             # print(data["id"],data["name"],"无type")
-#             relatedType=None
-#         G.nodes[int(data["id"])]= dict(entity=data["name"],
-#                                        imgUrl=data["imgUrl"],
-#                                        relatedType=relatedType,
-#                                        abstract=data["abstract"])
-#     G.relations = list(set(G.relations)) # 去重
-#     G.nodes_num=len(G.nodes)
-#     G.relations_num=len(G.relations)
-#
-#     print("Nolink个数为：",Nolink)
-#     print("NoType个数为：", NoType)
-#     print("node_help中的个数：",len(node_help))
-#     return G
-
 
 def writeToSql(entity_data,relations_data):
     db = Db("FinancialDate")

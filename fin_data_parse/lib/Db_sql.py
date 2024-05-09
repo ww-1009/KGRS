@@ -3,17 +3,19 @@
 
 import pymysql
 from pymysql.converters import escape_string
+
+
 class Db:
-    def __init__(self,db_name):
-        self.connect = pymysql.connect(host='10.244.196.151',  # 本地数据库
+    def __init__(self, db_name):
+        self.connect = pymysql.connect(host='192.168.0.107',  # 本地数据库
 
-                             user='root',  # 用户名
+                                       user='root',  # 用户名
 
-                             passwd='ww20011009',  # 数据库密码
+                                       passwd='ww20011009',  # 数据库密码
 
-                             db=db_name,  # 数据库名
+                                       db=db_name,  # 数据库名
 
-                             charset='utf8')  # 数据库编码type_transitive_dbp_new
+                                       charset='utf8')  # 数据库编码type_transitive_dbp_new
         self.cursor = self.connect.cursor()
 
     '''
@@ -21,7 +23,8 @@ class Db:
         sql='insert ignore into entity (id, entity, imgUrl, relatedType, abstract) values (%s, %s, %s, %s, %s);'
         datas=[(...),(...)]
     '''
-    def insert_ignore(self,sql,datas):
+
+    def insert_ignore(self, sql, datas):
         try:
             self.cursor.executemany(sql, datas)
             self.connect.commit()
@@ -29,9 +32,9 @@ class Db:
             self.connect.rollback()  # 发生错误时回滚
             print(e)
 
-    def select(self,sql,*s):
+    def select(self, sql, *s):
         # SQL 查询语句
-        if s!=():
+        if s != ():
             # s = escape_string(str(s))
             sql = sql % s
         try:
@@ -41,12 +44,9 @@ class Db:
             # 获取所有记录列表
             results = self.cursor.fetchall()
             print("数据查询成功")
-            # 关闭数据库连接
-            # self.connect.close()
             return results
         except:
             print("Error: unable to fetch data")
-
 
     # 关闭数据库连接
     def connect_close(self):
@@ -54,10 +54,11 @@ class Db:
 
 
 if __name__ == '__main__':
-    db=Db("FinancialDate")
+    db = Db("FinancialDate")
     # print(db.select("SELECT *FROM relation WHERE id_O = '%s'",1546))
     # print(db.select("SELECT *FROM relation WHERE id_S = '%s'", 2))
     # print(db.select("SELECT entity FROM entity WHERE （imgUrl='',abstract = ''"))
     # db.cursor.execute("UPDATE entity SET abstract = '' WHERE abstract='\n'")
 
-    results = db.select("SELECT id,entity FROM entity WHERE imgUrl='%s' and relatedType='%s' and abstract = '%s'",'','','')
+    results = db.select("SELECT id,entity FROM entity WHERE imgUrl='%s' and relatedType='%s' and abstract = '%s'", '',
+                        '', '')
