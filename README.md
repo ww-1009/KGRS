@@ -32,3 +32,8 @@
 
 **后端**
 
+1. 修改setting.py数据库配置
+2. 确保数据库数据完整
+3. 执行`python manage.py makemigrations`生成新的迁移文件
+4. 执行`python manage.py migrate`将生成的py文件映射应用到数据库
+5. `python manage.py runserver` 默认后端端口8000
