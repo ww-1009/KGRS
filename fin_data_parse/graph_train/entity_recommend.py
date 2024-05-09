@@ -1,9 +1,10 @@
 import torch
 import torch.nn.functional as F
 
-# 简单推荐逻辑
 from graph_train.module import ModifiedGCN
-
+from graph_train.train_tool import get_x, get_node_pairs, load_model
+from lib.GetTrainDate import get_train_data
+from lib.Db_sql import Db
 
 def get_related_entities(model, entity_id, related_id_list):
     # 将实体id转换为张量
@@ -61,7 +62,7 @@ if __name__ == '__main__':
             sql_data.append(value)
         while len(sql_data) < 11:
             sql_data.extend([-1])
-        print(sql_data)
+        # print(sql_data)
         sql_datas.append(tuple(sql_data))
 
     sql_string = 'insert into fd_top5 (id, top1_id, value1, top2_id, value2,top3_id, value3,top4_id, value4,top5_id, value5) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'

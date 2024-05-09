@@ -17,6 +17,7 @@ from graph_train.module import ModifiedGCN
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
+
 def get_label_embedding(labels, model):
     embeddings = []
     for label in labels:
@@ -73,6 +74,7 @@ def get_x(entity_datas, relation_datas):
     data = Data(x=x, edge_index=edge_index)
 
     return data
+
 
 def save_model(model, path):
     torch.save(model.state_dict(), path)
