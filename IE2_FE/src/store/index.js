@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    userId: 1,
     inputStr: "",
     value: "1",
     name:"",
@@ -13,6 +14,7 @@ export default new Vuex.Store({
     entityLinks: [],
     porpertyNode:[],
     porpertyLinks:[],
+    entityInfoAll: {},
     typeNode:[],
     typeLinks:[],
     typeMap:{},
@@ -27,6 +29,9 @@ export default new Vuex.Store({
     first:false,
   },
   mutations: {
+    changeUserId(state,item){
+      state.userId=item
+    },
     changeInputStr(state,item){
       state.inputStr=item
     },
@@ -44,6 +49,9 @@ export default new Vuex.Store({
     },
     changeEntityLinks(state,item){
       state.entityLinks=item
+    },
+    changeEntityInfoAll(state,item){
+      state.entityInfoAll=item
     },
     changeTypeLinks(state,item){
       state.typeLinks=item

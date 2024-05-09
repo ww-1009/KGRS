@@ -1,7 +1,7 @@
 <template>
   <el-container class="home-container">
     <el-header>
-      <span>&nbsp;&nbsp;&nbsp;Nasdap Graph</span>
+      <span>&nbsp;&nbsp;&nbsp;基于金融知识图谱的实体推荐系统</span>
 
     </el-header>
     <!-- 页面主体区域 -->
@@ -29,14 +29,14 @@
             <i class="el-icon-share"></i>
             <span slot="title">实体关系图</span>
           </el-menu-item>
-           <el-menu-item index="/type">
+           <!-- <el-menu-item index="/type">
             <i class="el-icon-menu"></i>
             <span slot="title">类型关系图</span>
-          </el-menu-item>
-          <el-menu-item index="/porperty">
+          </el-menu-item> -->
+          <!-- <el-menu-item index="/porperty">
             <i class="el-icon-orange"></i>
             <span slot="title">属性图</span>
-          </el-menu-item>
+          </el-menu-item> -->
           </el-submenu>
 
           <el-submenu index="2">
@@ -45,15 +45,15 @@
             <span>我的空间</span>
           </template>
           <el-menu-item index="/selfgraph">
-            <i class="el-icon-share"></i>
+            <i class="el-icon-s-custom"></i>
             <span slot="title">自定义图谱</span>
           </el-menu-item>
            <el-menu-item index="/mycollect">
-            <i class="el-icon-menu"></i>
+            <i class="el-icon-star-on"></i>
             <span slot="title">节点收藏</span>
           </el-menu-item>
           <el-menu-item index="/setting">
-            <i class="el-icon-menu"></i>
+            <i class="el-icon-s-tools"></i>
             <span slot="title">个人设置</span>
           </el-menu-item>
         </el-submenu>
@@ -130,7 +130,6 @@ export default {
           if (res.data.code === 1) {
             that.newstop = res.data.data[0];
             that.newsimg=res.data.data[1];
-            console.log(that.newstop);
             //提示：
           } else {
             //失败的提示！

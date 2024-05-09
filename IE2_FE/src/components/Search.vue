@@ -3,64 +3,41 @@
     <el-row>
       <el-col :span="11">
         <div class="sub-title"></div>
-        <el-autocomplete
-          class="inline-input"
-          v-model="inputStr"
-          :fetch-suggestions="querySearch"
-          placeholder="请输入内容"
-          :trigger-on-focus="false"
-          @select="handleSelect"
-          style="width: 500px"
-        >
-          <el-button
-            slot="append"
-            icon="el-icon-search"
-            @click="queryButten()"
-          ></el-button>
+        <el-autocomplete class="inline-input" v-model="inputStr" :fetch-suggestions="querySearch" placeholder="请输入内容"
+          :trigger-on-focus="false" @select="handleSelect" style="width: 500px">
+          <el-button slot="append" icon="el-icon-search" @click="queryButten()"></el-button>
         </el-autocomplete>
       </el-col>
       <el-col :span="2">
         <!-- <el-button type="text">Elon Musk</el-button> -->
         <h4 style="margin-top:11px">Example:</h4>
-        
+
       </el-col>
       <el-col :span="2">
-        <el-link @click="inputStr='Elon Musk'" style="margin-top:13px">Elon Musk</el-link>
+        <el-link @click="inputStr = 'Elon Musk'" style="margin-top:13px">Elon Musk</el-link>
       </el-col>
       <el-col :span="2">
-        <el-link @click="inputStr='Bill Gates'" style="margin-top:13px">Bill Gates</el-link>
+        <el-link @click="inputStr = 'Bill Gates'" style="margin-top:13px">Bill Gates</el-link>
       </el-col>
-            <el-col :span="5">
-        <el-link @click="inputStr='Mark Zuckerberg'" style="margin-top:13px">Mark Zuckerberg</el-link>
+      <el-col :span="5">
+        <el-link @click="inputStr = 'Mark Zuckerberg'" style="margin-top:13px">Mark Zuckerberg</el-link>
       </el-col>
     </el-row>
     <el-divider style="padding: 10px"></el-divider>
     <div style="margin: 0 auto">
       <el-row>
-        <el-col :span="12">
+        <el-col :span="5">
           <h1 v-show="!first"></h1>
           <h1 v-show="first" style="font-size: 28px; margin: 0px; padding: 0">
-            {{ name+path }}
+            {{ name + path }}
           </h1>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="19">
           <div>
-            <el-select v-model="value" placeholder="请选择查询深度">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-            <el-switch
-              v-model="explore"
-              active-text="explore"
-              inactive-text="show"
-              style="margin-left: 20px"
-            >
-            </el-switch>
+            <el-descriptions direction="vertical" :column="5" size='mini' border>
+              
+              <el-descriptions-item :key="key" v-for="key in Object.keys(entityTop)" :label=key >{{ entityTop[key] }}</el-descriptions-item>
+            </el-descriptions>
           </div>
         </el-col>
       </el-row>
@@ -77,6 +54,7 @@ export default {
     return {
       exp: false,
       possible_out: [],
+      entityTop: {},
       options: [
         {
           value: "1",
@@ -93,7 +71,7 @@ export default {
       ],
     };
   },
-  mounted() {},
+  mounted() { },
   computed: {
     inputStr: {
       get() {
@@ -141,6 +119,14 @@ export default {
       },
       set(val) {
         this.$store.commit("changeEntityLinks", val);
+      },
+    },
+    entityInfoAll: {
+      get() {
+        return this.$store.state.entityInfoAll;
+      },
+      set(val) {
+        this.$store.commit("changeEntityInfoAll", val);
       },
     },
     porpertyNode: {
@@ -287,8 +273,8 @@ export default {
     //       that.$message.error("获取后端查询结果出现异常!");
     //     });
     // },
-    queryButten(){
-      this.hasSearched=[];
+    queryButten() {
+      this.hasSearched = [];
       this.queryNasdaq();
     },
     //查询按钮
@@ -307,18 +293,17 @@ export default {
         .then(function (res) {
           if (res.data.code === 200) {
             // that.name = res.data.data[0];
-            // that.img = res.data.data[1];
-            // that.abstract = res.data.data[2];
+
             that.entityNode = res.data['entity_node'];
             that.entityLinks = res.data['entity_relation'];
+            that.entityInfoAll = res.data['entity_info_all'];
+            that.entityTop = res.data['entity_top'];
             // that.porpertyNode = res.data.data[5];
             // that.porpertyLinks = res.data.data[6];
             // that.typeNode = res.data.data[7];
             // that.typeLinks = res.data.data[8];
             // that.typeMap = res.data.data[9];
             // that.newstop= res.data.data[10]
-            console.log(that.entityNode)
-            console.log(that.entityLinks)
 
             // console.log(that.typeMap)
           } else {

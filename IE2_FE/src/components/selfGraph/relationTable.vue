@@ -3,7 +3,7 @@
         <el-table
             :data="relationInfoList.filter(data => !search || data.s.toLowerCase().includes(search.toLowerCase()))"
             style="width: 100%">
-            <el-table-column label="id" prop="id" width="80">
+            <el-table-column label="id" prop="relation_id" width="80">
             </el-table-column>
             <el-table-column label="主语" prop="s" width="100">
             </el-table-column>
@@ -48,7 +48,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="success" @click="saveRelation()">提交</el-button>
+                <el-button type="success" @click="saveRelationInfo()">提交</el-button>
                 <el-button type="primary" @click="dialogVisible = false">取消</el-button>
             </span>
         </el-dialog>
@@ -78,18 +78,21 @@ export default {
             total: 3,
             size: 10,
 
-            relationInfoList: [{
-                id: 0,
-                id_s: 0,
-                s: '贾宝玉',
-                p: '爱人',
-                o: '林黛玉',
-                id_o: 1
-            }],
-            relationInfo: {},
+            relationInfoList: [],
+            relationInfo: {id:-1, id_s:-1, s:'', p:'', o:'', id_o:-1},
             search: '',
             curId: ''
         }
+    },
+    computed: {
+        userId: {
+            get() {
+                return this.$store.state.userId;
+            },
+            set(val) {
+                this.$store.commit("changeUserId", val);
+            },
+        },
     },
     watch: {
         //假如现在是第三页，只有一条数据了。将其删除，就没有第三页了。应该跳到第二页展示出5条数据。
@@ -126,50 +129,39 @@ export default {
             this.dialog2Visible = true;
             this.curId = row.id;
         },
-        async handleDel() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/del",
-                //     qs.stringify({
-                //         id: this.curId
-                //     })
-                // );
-                this.curId = "";
-                this.dialog2Visible = false;
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getRelationInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+
+        handleDel() {
+            let that = this;
+            this.$http
+                .post("nasdaq/delrelation/", {
+                    id: that.curId,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.curId = "";
+                        that.dialog2Visible = false;
+                        that.getRelationInfoList();
+                        that.$message({
+                            message: "实体关系删除成功!",
+                            type: 'success'
+                        });
+                    } else {
+                        //失败的提示！
+                        that.$message("数据更新失败");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("后端更新数据出现异常!");
+                });
         },
 
         tarClose(tag) {
             this.relationInfo.type.splice(this.relationInfo.type.indexOf(tag), 1);
         },
 
-        async getRelationInfoList() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/list",
-                //     qs.stringify({
-                //         page: this.page,
-                //         size: this.size
-                //     })
-                // );
-                // this.total = res.data.Data.Total;
-                // this.GraphInfoList = res.data.Data.List;
-                console.log("getBookList");
-            } catch (e) {
-                console.log(e);
-            }
-        },
-
         getRelationInfoList() {
             let that = this;
-            console.log(that.activeGraphId)
             this.$http
                 .post("nasdaq/selfrelationlist/", {
                     graph_id: that.activeGraphId,
@@ -192,27 +184,39 @@ export default {
                 });
         },
 
-        async saveRelation() {
-            try {
-                // let res = await axios.post(
-                //     "http://127.0.0.1:8848/api/v1/book/save",
-                //     qs.stringify({
-                //         id: this.graphInfo.id,
-                //         name: this.graphInfo.name,
-                //         type: this.graphInfo.description
-                //     })
-                // );
-                this.dialogVisible = false;
-                this.relationInfo = {};
-                // this.$message({
-                //     message: res.data.Msg,
-                //     type: "success"
-                // });
-                this.getRelationInfoList();
-            } catch (e) {
-                console.log(e);
-            }
+        saveRelationInfo() {
+            let that = this;
+            this.$http
+                .post("nasdaq/saverelationinfo/", {
+                    user_id: that.userId,
+                    graph_id: that.activeGraphId,
+                    relation_id: that.relationInfo.id,
+                    id_s: that.relationInfo.id_s,
+                    s: that.relationInfo.s,
+                    p: that.relationInfo.p,
+                    o: that.relationInfo.o,
+                    id_o: that.relationInfo.id_o,
+                })
+                .then(function (res) {
+                    if (res.data.code === 200) {
+                        that.dialogVisible = false;
+                        that.relationInfo = {id:-1, id_s:-1, s:'', p:'', o:'', id_o:-1};
+                        that.getRelationInfoList();
+                        that.$message({
+                            message: "数据更新成功!",
+                            type: 'success'
+                        });
+                    } else {
+                        //失败的提示！
+                        that.$message("数据更新失败");
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    that.$message.error("后端更新数据出现异常!");
+                });
         },
+
 
         handleDelete(index, row) {
             console.log(index, row);
