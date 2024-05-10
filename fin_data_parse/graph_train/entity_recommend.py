@@ -1,11 +1,14 @@
 import torch
-import torch.nn.functional as F
+from torch.nn import BCEWithLogitsLoss
+from torch.optim import Adam
 
 from graph_train.module import ModifiedGCN
 from graph_train.train_tool import get_x, get_node_pairs, load_model
 from lib.GetTrainDate import get_train_data
 from lib.Db_sql import Db
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 def get_related_entities(model, entity_id, related_id_list):
     # 将实体id转换为张量
     node_pairs_tensor = torch.tensor([[entity_id, neighbor_id] for neighbor_id in range(len(entity_datas))],

@@ -1,19 +1,12 @@
 from pathlib import Path
-
 import torch
-from torch.nn import BCEWithLogitsLoss
 from torch_geometric.data import Data
-from torch.optim import Adam
+
 from gensim.models import KeyedVectors
 import numpy as np
 import random
 
-from lib.Db_sql import Db
-from lib.GetTrainDate import get_train_data
-
 # 检查CUDA是否可用
-from graph_train.module import ModifiedGCN
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 

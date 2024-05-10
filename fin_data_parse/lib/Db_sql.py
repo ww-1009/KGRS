@@ -7,7 +7,7 @@ from pymysql.converters import escape_string
 
 class Db:
     def __init__(self, db_name):
-        self.connect = pymysql.connect(host='192.168.0.107',  # 本地数据库
+        self.connect = pymysql.connect(host='127.0.0.1',  # 本地数据库
 
                                        user='root',  # 用户名
 
